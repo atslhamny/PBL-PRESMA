@@ -1,4 +1,4 @@
-<!-- kategori mahasiswa -->
+<!-- kompetisi admin -->
 
 <section class="content-header">
     <div class="card">

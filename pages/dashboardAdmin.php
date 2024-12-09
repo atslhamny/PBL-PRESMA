@@ -1,3 +1,5 @@
+<!-- dashboard admin -->
+
 <style>
     /* General styling */
     .breadcrumb {
