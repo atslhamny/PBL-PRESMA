@@ -1,3 +1,5 @@
+<!-- prestasiAdminModel -->
+
 <?php
 include('Model.php');
 
@@ -18,7 +20,7 @@ class PrestasiAdminModel extends Model
     {
         if ($this->driver == 'mysql') {
             $query = $this->db->prepare("INSERT INTO {$this->table} (buku_kode, buku_nama, kategori_id, jumlah, deskripsi, gambar) 
-                                         VALUES (?, ?, ?, ?, ?, ?)");
+                                        VALUES (?, ?, ?, ?, ?, ?)");
             $query->bind_param('ssisss', $data['buku_kode'], $data['buku_nama'], $data['kategori_id'], $data['jumlah'], $data['deskripsi'], $data['gambar']);
             $query->execute();
         } else {
@@ -65,8 +67,8 @@ class PrestasiAdminModel extends Model
     {
         if ($this->driver == 'mysql') {
             $query = $this->db->prepare("UPDATE {$this->table} 
-                                         SET buku_kode = ?, buku_nama = ?, kategori_id = ?, jumlah = ?, deskripsi = ?, gambar = ? 
-                                         WHERE buku_id = ?");
+                                        SET buku_kode = ?, buku_nama = ?, kategori_id = ?, jumlah = ?, deskripsi = ?, gambar = ? 
+                                        WHERE buku_id = ?");
             $query->bind_param('ssiissi', $data['buku_kode'], $data['buku_nama'], $data['kategori_id'], $data['jumlah'], $data['deskripsi'], $data['gambar'], $id);
             $query->execute();
         } else {

@@ -1,4 +1,4 @@
-<!-- kategorimodel -->
+<!-- kompetisi admin model -->
 
 <?php
 include('Model.php');

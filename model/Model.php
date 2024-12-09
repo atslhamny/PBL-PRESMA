@@ -1,7 +1,6 @@
 <!-- model -->
-
+ 
 <?php
-
 abstract class Model
 {
     public abstract function insertData($id);
