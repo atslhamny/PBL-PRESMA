@@ -1,4 +1,4 @@
-<!-- kategoriAction -->
+<!-- kompetisiAdminAction -->
 
 <?php
 include('../lib/Session.php');

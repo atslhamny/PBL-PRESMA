@@ -1,4 +1,4 @@
-<!-- auth -->
+<!-- auth.php -->
 
 <?php
 include('../lib/Session.php');
