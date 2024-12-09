@@ -1,5 +1,4 @@
 <!-- login -->
-
 <?php
 include('lib/Session.php');  // Memasukkan file Session.php untuk sesi pengguna
 
@@ -22,7 +21,7 @@ if ($session->get('is_login') === true) {
 
   <!-- Menyertakan Google Font Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  
+
   <!-- Menyertakan file CSS dari AdminLTE -->
   <link rel="stylesheet" href="adminlte/plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
