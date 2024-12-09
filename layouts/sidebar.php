@@ -1,4 +1,4 @@
-<!-- sidebarrrr -->
+<!-- sidebar -->
 
 <div class="sidebar" style="background-color: #1E6892;">
     <!-- Sidebar user (optional) -->
