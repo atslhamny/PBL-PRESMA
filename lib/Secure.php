@@ -1,6 +1,5 @@
+<!-- secure.php -->
 <?php
-
-// secure.php
 function antiSqlInjection($data)
 {
 

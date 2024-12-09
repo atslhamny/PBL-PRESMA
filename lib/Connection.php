@@ -1,7 +1,6 @@
 <!-- connection -->
 
 <?php
-
 // sql
 $use_driver = 'sqlsrv'; // mysql atau sqlsrv
 $host = 'localhost';
