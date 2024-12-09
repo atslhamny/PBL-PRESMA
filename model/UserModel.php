@@ -1,4 +1,4 @@
-<!-- usermodel -->
+<!-- userModel -->
 
 <?php
 include('Model.php');
@@ -30,7 +30,7 @@ password) values(?,?,?,?)");
                 password_hash($data['password'], PASSWORD_DEFAULT)
             );
             // eksekusi query untuk menyimpan ke database
-            
+
             $query->execute();
         } else {
             // eksekusi query untuk menyimpan ke database
