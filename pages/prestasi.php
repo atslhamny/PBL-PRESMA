@@ -28,149 +28,86 @@ $kategori = getKategori();
             <h4><b>Daftar Prestasi</b></h4>
             <!-- <br> -->
             <p>Mahasiswa Politeknik Negeri Malang disiapkan untuk dapat bekerja maupun menjadi wirausaha yang sukses. Untuk itu, aktif dalam berbagai kegiatan lomba merupakan salah satu cara untuk mengasah kemampuan dan bakat para mahasiswa. Berikut beberapa prestasi yang telah diraih para mahasiswa dalam dekade terakhir</p>
-
-            <!-- <div class="card-tools">
-                <button type="button" class="btn btn-md btn-primary" onclick="tambahData()">
-                    Tambah Prestasi
-                </button>
-            </div> -->
-
         </div>
+
+        <!-- tabel -->
         <div class="card-body">
             <table class="table table-sm table-bordered table-striped" id="table-data">
                 <thead>
                     <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Judul Kompetisi</th>
-                        <th>Tahun</th>
-                        <th>Peringkat</th>
-                        <th>Tingkat</th>
+                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">No</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Nama</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Judul Kompetisi</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Tahun</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Peringkat</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Tingkat</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">1</td>
+                    <td>Atsila</td>
+                    <td>Bussiness Plan</td>
+                    <td>2024</td>
+                    <td>Juara 1</td>
+                    <td>Nasional</td>
+                </tr>
+                <tr class="even">
+                    <td class="dtr-control sorting_1" tabindex="0">2</td>
+                    <td>Rheina</td>
+                    <td>Bussiness Plan</td>
+                    <td>2024</td>
+                    <td>Juara 1</td>
+                    <td>Nasional</td>
+                </tr>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">3</td>
+                    <td>Afgan</td>
+                    <td>Bussiness Plan</td>
+                    <td>2024</td>
+                    <td>Juara 1</td>
+                    <td>Nasional</td>
+                </tr>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">3</td>
+                    <td>Bimantara</td>
+                    <td>Bussiness Plan</td>
+                    <td>2024</td>
+                    <td>Juara 1</td>
+                    <td>Nasional</td>
+                </tr>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">3</td>
+                    <td>Puput</td>
+                    <td>Bussiness Plan</td>
+                    <td>2024</td>
+                    <td>Juara 1</td>
+                    <td>Nasional</td>
+                </tr>
                 </tbody>
             </table>
         </div>
 
+        <!-- tutup tabel -->
+
     </div>
 </section>
 
-
-
 <script>
-    function tambahData() {
-        $('#form-data').modal('show');
-        $('#form-tambah').attr('action', 'action/prestasiAction.php?act=save');
-        $('#buku_kode').val('');
-        $('#buku_nama').val('');
-        $('#kategori_id').val('');
-        $('#jumlah').val('');
-        $('#deskripsi').val('');
-        $('#gambar').val('');
-    }
-
-    function editData(id) {
-        $.ajax({
-            url: 'action/prestasiAction.php?act=get&id=' + id,
-            method: 'post',
-            success: function(response) {
-                var data = JSON.parse(response);
-                $('#form-data').modal('show');
-                $('#form-tambah').attr('action', 'action/prestasiAction.php?act=update&id=' + id);
-                $('#buku_kode').val(data.buku_kode);
-                $('#buku_nama').val(data.buku_nama);
-                $('#kategori_id').val(data.kategori_id).trigger('change');
-                $('#jumlah').val(data.jumlah);
-                $('#deskripsi').val(data.deskripsi || '');
-                $('#gambar').val(data.gambar);
-            }
-        });
-    }
-
-
-    function deleteData(id) {
-        if (confirm('Apakah anda yakin?')) {
-            $.ajax({
-                url: 'action/prestasiAction.php?act=delete&id=' + id,
-                method: 'post',
-                success: function(response) {
-                    var result = JSON.parse(response);
-                    if (result.status) {
-                        tabelData.ajax.reload();
-                    } else {
-                        alert(result.message);
-                    }
-                }
-            });
-        }
-    }
-
-    var tabelData;
     $(document).ready(function() {
-        tabelData = $('#table-data').DataTable({
-            ajax: 'action/prestasiAction.php?act=load',
-        });
-        $('#form-tambah').validate({
-            rules: {
-                buku_kode: {
-                    required: true
+        $('#table-data').DataTable({
+            paging: true,
+            searching: true,
+            lengthChange: true,
+            pageLength: 10,
+            language: {
+                paginate: {
+                    previous: "Previous",
+                    next: "Next"
                 },
-                buku_nama: {
-                    required: true
-                },
-                kategori_id: {
-                    required: true
-                },
-                jumlah: {
-                    required: true,
-                    number: true,
-                    min: 1
-                },
-                deskripsi: {
-                    required: true
-                },
-                gambar: {
-                    url: true
-                },
-            },
-            messages: {
-                kategori_id: {
-                    required: "Kategori harus dipilih."
-                },
-                deskripsi: {
-                    required: "Deskripsi tidak boleh kosong."
-                },
-            },
-            errorElement: 'span',
-            errorPlacement: function(error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
-            },
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-            submitHandler: function(form) {
-                $.ajax({
-                    url: $(form).attr('action'),
-                    method: 'post',
-                    data: new FormData(form),
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        var result = JSON.parse(response);
-                        if (result.status) {
-                            $('#form-data').modal('hide');
-                            tabelData.ajax.reload();
-                        } else {
-                            alert(result.message);
-                        }
-                    }
-                });
+                lengthMenu: "Show _MENU_ entries",
+                search: "Search:"
             }
         });
     });
 </script>
+
