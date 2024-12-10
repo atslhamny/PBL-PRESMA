@@ -17,7 +17,7 @@
                         <span class="fas fa-home" style="margin-right: 5px;"></span>
                         <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
                     </li>
-                    <li class="breadcrumb-item active">Dashboard</li>
+                    <li class="breadcrumb-item active">Form Kompetisi Mahasiswa</li>
                 </ol>
             </div>
         </div>
