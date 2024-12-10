@@ -1,13 +1,13 @@
 <!-- login -->
 <?php
-include('lib/Session.php');  // Memasukkan file Session.php untuk sesi pengguna
+include('lib/Session.php'); // Memasukkan file Session.php untuk sesi pengguna
 
-$session = new Session();  // Membuat objek sesi
+$session = new Session(); // Membuat objek sesi
 
 // Jika pengguna sudah login, arahkan ke halaman index.php
 if ($session->get('is_login') === true) {
   header('Location: index.php');
-  exit();  // Menghentikan eksekusi lebih lanjut setelah redirect
+  exit(); // Menghentikan eksekusi lebih lanjut setelah redirect
 }
 ?>
 
@@ -19,13 +19,17 @@ if ($session->get('is_login') === true) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PresMa - Login</title>
 
-  <!-- Menyertakan Google Font Source Sans Pro -->
+  <!-- Google Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
-  <!-- Menyertakan file CSS dari AdminLTE -->
-  <link rel="stylesheet" href="adminlte/plugins/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <link rel="stylesheet" href="adminlte/dist/css/adminlte.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/icheck-bootstrap/3.0.1/icheck-bootstrap.min.css">
+
+  <!-- AdminLTE -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
 
   <style>
     body {
@@ -84,7 +88,7 @@ if ($session->get('is_login') === true) {
           $message = $session->getFlash('message');
           echo '<div class="alert alert-warning">' . $message .
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          </div>';
+                    </div>';
         }
         ?>
 
@@ -128,13 +132,13 @@ if ($session->get('is_login') === true) {
   </div>
 
   <!-- jQuery -->
-  <script src="adminlte/plugins/jquery/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <!-- Bootstrap 4 -->
-  <script src="adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <!-- AdminLTE App -->
-  <script src="adminlte/dist/js/adminlte.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
   <!-- Form validation -->
-  <script src="adminlte/plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.5/jquery.validate.min.js"></script>
   <script>
     $(document).ready(function() {
       $('#form-login').validate({

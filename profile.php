@@ -1,4 +1,3 @@
-<!-- profile -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,17 +10,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="adminlte/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 
-    <!-- AdminLTE CSS -->
-    <link rel="stylesheet" href="adminlte/dist/css/adminlte.min.css">
-
-    <!-- Optional: Tambahkan CSS lokal jika ada -->
-    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <!-- AdminLTE -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 
     <style>
         body {
@@ -63,8 +58,7 @@
     </style>
 </head>
 
-<!-- <body class="hold-transition login-page"> -->
-    <body class="hold-transition">
+<body class="hold-transition">
     <div class="login-box">
         <div class="card card-warning">
             <div class="card-header text-center">
@@ -76,7 +70,7 @@
                 <div class="card-body">
                     <div class="card-body d-flex align-items-center">
                         <div class="profile-image">
-                            <img src="img/profil.png" id="profileImage" class="img-thumbnail" alt="Profile">
+                            <img src="https://via.placeholder.com/150" id="profileImage" class="img-thumbnail" alt="Profile">
                         </div>
                         <div class="form-group ml-4" style="width: 100%;">
                             <label for="exampleInputFile">Ubah Foto Profil</label>
@@ -146,26 +140,6 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="changePassword">Change Password</label>
-                        <div class="input-group mb-3">
-                            <input type="password" class="form-control" placeholder="Password">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-lock"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="input-group mb-3">
-                            <input type="password" class="form-control" placeholder="Confirm Password">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-lock"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="exampleCheck1">
                         <label class="form-check-label" for="exampleCheck1">Remember Me</label>
@@ -193,6 +167,15 @@
         </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AdminLTE App -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
     <script>
         function togglePassword() {
             const passwordField = document.getElementById('exampleInputPassword1');
@@ -209,15 +192,6 @@
             }
         }
     </script>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Bootstrap 4 -->
-    <script src="adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- AdminLTE App -->
-    <script src="adminlte/dist/js/adminlte.min.js"></script>
 </body>
 
 </html>
