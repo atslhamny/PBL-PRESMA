@@ -79,7 +79,7 @@ if ($session->get('is_login') === true) {
       </div>
 
       <div class="card-body">
-        <p class="login-box-msg">Sign in to start your session</p>
+        <p class="login-box-msg">Silahkan Login Terlebih Dahulu</p>
 
         <!-- Menampilkan pesan flash jika login gagal -->
         <?php
@@ -103,10 +103,10 @@ if ($session->get('is_login') === true) {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" name="password" required>
+            <input type="password" class="form-control" placeholder="Password" name="password" id="password" required>
             <div class="input-group-append">
               <div class="input-group-text">
-                <span class="fas fa-lock"></span>
+                <span id="toggle-password" class="fas fa-eye"></span>
               </div>
             </div>
           </div>
@@ -164,6 +164,19 @@ if ($session->get('is_login') === true) {
         },
         unhighlight: function(element, errorClass, validClass) {
           $(element).removeClass('is-invalid');
+        }
+      });
+
+      // Show/Hide password functionality
+      $('#toggle-password').on('click', function() {
+        const passwordField = $('#password');
+        const passwordFieldType = passwordField.attr('type');
+        if (passwordFieldType === 'password') {
+          passwordField.attr('type', 'text'); // Ubah menjadi teks untuk menampilkan password
+          $(this).removeClass('fa-eye').addClass('fa-eye-slash'); // Ubah ikon menjadi mata tertutup
+        } else {
+          passwordField.attr('type', 'password'); // Ubah kembali menjadi password
+          $(this).removeClass('fa-eye-slash').addClass('fa-eye'); // Ubah ikon menjadi mata terbuka
         }
       });
     });

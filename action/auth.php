@@ -24,12 +24,12 @@ if ($act == 'login') {
 
             // Redirect berdasarkan role_id
             if ($data['role_id'] == 1) {
-                header('Location: ../admin/dashboardAdmin.php', false); // Halaman admin
+                header('Location: ../pages/dashboardAdmin.php', false); // Halaman admin
             } elseif ($data['role_id'] == 2) {
-                header('Location: ../mahasiswa/dashboard.php', false); // Halaman mahasiswa
+                header('Location: ../pages/dashboard.php', false); // Halaman mahasiswa
             } else {
                 // Default redirect jika role_id tidak dikenal
-                header('Location: ../index.php', false);
+                echo "role_id tidak dikenal";
             }
         } else {
             // Password salah
