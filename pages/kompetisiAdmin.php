@@ -1,4 +1,4 @@
-<!-- kompetisi admin -->
+<!-- kategori mahasiswa -->
 
 <section class="content-header">
     <div class="card">
@@ -32,137 +32,115 @@
             </div>
         </div>
         <div class="card-body">
+            <!-- tabel -->
+        <div class="card-body">
             <table class="table table-sm table-bordered table-striped" id="table-data">
-
                 <thead>
                     <tr>
-                        <th>No</th>
-                        <th>Kode Kategori</th>
-                        <th>Nama Kategori</th>
-                        <th>Aksi</th>
+                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">No</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Judul Kompetisi</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Keterangan</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Edit/Detail</th>
+                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Hapus</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">1</td>
+                    <td>Bussiness Plan</td>
+                    <td>Keterangan</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
+                            <i class="fas fa-clipboard-list"></i>
+                        </button>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="even">
+                    <td class="dtr-control sorting_1" tabindex="0">2</td>
+                    <td>Bussiness Plan</td>
+                    <td>Keterangan</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
+                            <i class="fas fa-clipboard-list"></i>
+                        </button>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">3</td>
+                    <td>Bussiness Plan</td>
+                    <td>Keterangan</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
+                            <i class="fas fa-clipboard-list"></i>
+                        </button>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">3</td>
+                    <td>Bussiness Plan</td>
+                    <td>Keterangan</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
+                            <i class="fas fa-clipboard-list"></i>
+                        </button>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">3</td>
+                    <td>Bussiness Plan</td>
+                    <td>Keterangan</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
+                            <i class="fas fa-clipboard-list"></i>
+                        </button>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- tutup tabel -->
+        </div>
     </div>
 </section>
-<div class="modal fade" id="form-data" style="display: none;" aria-hidden="true">
-    <form action="action/kategoriAction.php?act=save" method="post" id="form-tambah">
-        <!-- Ukuran Modal
-        modal-sm : Modal ukuran kecil
-        modal-md : Modal ukuran sedang
-        modal-lg : Modal ukuran besar
-        modal-xl : Modal ukuran sangat besar
-        penerapan setelah class modal-dialog seperti di bawah
-        -->
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Tambah Kategori</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Kode Kategori</label>
-                        <input type="text" class="form-control" name="kategori_kode"
-                            id="kategori_kode">
-                    </div>
-                    <div class="form-group">
-                        <label>Nama Kategori</label>
-                        <input type="text" class="form-control" name="kategori_nama"
-                            id="kategori_nama">
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" datadismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
 <script>
-    function tambahData() {
-        $('#form-data').modal('show');
-        $('#form-tambah').attr('action', 'action/kategoriAction.php?act=save');
-        $('#kategori_kode').val('');
-        $('#kategori_nama').val('');
-    }
-
-    function editData(id) {
-        $.ajax({
-            url: 'action/kategoriAction.php?act=get&id=' + id,
-            method: 'post',
-            success: function(response) {
-                var data = JSON.parse(response);
-                $('#form-data').modal('show');
-                $('#form-tambah').attr('action',
-                    'action/kategoriAction.php?act=update&id=' + id);
-                $('#kategori_kode').val(data.kategori_kode);
-                $('#kategori_nama').val(data.kategori_nama);
-            }
-        });
-    }
-
-    function deleteData(id) {
-        if (confirm('Apakah anda yakin?')) {
-            $.ajax({
-                url: 'action/kategoriAction.php?act=delete&id=' + id,
-                method: 'post',
-                success: function(response) {
-                    var result = JSON.parse(response);
-                    if (result.status) {
-                        tabelData.ajax.reload();
-                    } else {
-                        alert(result.message);
-                    }
-                }
-            });
-        }
-    }
-    var tabelData;
     $(document).ready(function() {
-        tabelData = $('#table-data').DataTable({
-            ajax: 'action/kategoriAction.php?act=load',
-        });
-        $('#form-tambah').validate({
-            rules: {
-                kategori_kode: {
-                    required: true,
-                    minlength: 3
+        $('#table-data').DataTable({
+            paging: true,
+            searching: true,
+            lengthChange: true,
+            pageLength: 10,
+            language: {
+                paginate: {
+                    previous: "Previous",
+                    next: "Next"
                 },
-                kategori_nama: {
-                    required: true,
-                    minlength: 5
-                }
-            },
-            errorElement: 'span',
-            errorPlacement: function(error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
-            },
-            highlight: function(element, errorClass, validClass) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element, errorClass, validClass) {
-                $(element).removeClass('is-invalid');
-            },
-            submitHandler: function(form) {
-                $.ajax({
-                    url: $(form).attr('action'),
-                    method: 'post',
-                    data: $(form).serialize(),
-                    success: function(response) {
-                        var result = JSON.parse(response);
-                        if (result.status) {
-                            $('#form-data').modal('hide');
-                            tabelData.ajax.reload(); // reload data tabel
-                        } else {
-                            alert(result.message);
-                        }
-                    }
-                });
+                lengthMenu: "Show _MENU_ entries",
+                search: "Search:"
             }
         });
     });
