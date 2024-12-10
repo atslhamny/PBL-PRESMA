@@ -1,3 +1,4 @@
+
 <?php
 include('../lib/Session.php');
 include('../lib/Connection.php');
@@ -9,11 +10,7 @@ if ($act == 'login') {
     $username = $_POST['username'];
     $password = $_POST['password'];
     include('../model/UserModel.php');
-
-    // Menggunakan model untuk mendapatkan data user berdasarkan username
-    $user = new UserModel();
-    $data = $user->getSingleDataByKeyword('username', $username);
-
+  
     if ($data) {
         // Jika password sesuai
         if (password_verify($password, $data['password'])) {
@@ -49,5 +46,5 @@ if ($act == 'login') {
     }
 } else if ($act == 'logout') {
     $session->deleteAll();
-    header('Location: ../login.php', false);
+    header('Location: ../landingPage.php', false);
 }
