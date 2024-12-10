@@ -6,7 +6,7 @@ include('Model.php');
 class UserModel extends Model
 {
     protected $db;
-    protected $table = 'm_user';
+    protected $table = 'users';
     protected $driver;
     public function __construct()
     {
@@ -18,28 +18,19 @@ class UserModel extends Model
     public function insertData($data)
     {
         if ($this->driver == 'mysql') {
-            // prepare statement untuk query insert
-            $query = $this->db->prepare("insert into {$this->table} (username, nama, level,
-password) values(?,?,?,?)");
-            // binding parameter ke query, "s" berarti string, "ss" berarti dua string
+            $query = $this->db->prepare("insert into {$this->table} (username, password, role_id) values(?,?,?)");
             $query->bind_param(
-                'ssss',
+                'ssi',
                 $data['username'],
-                $data['nama'],
-                $data['level'],
-                password_hash($data['password'], PASSWORD_DEFAULT)
+                password_hash($data['password'], PASSWORD_DEFAULT),
+                $data['role_id']
             );
-            // eksekusi query untuk menyimpan ke database
-
             $query->execute();
         } else {
-            // eksekusi query untuk menyimpan ke database
-            sqlsrv_query($this->db, "insert into {$this->table} (username, nama, level,
-password) values(?,?,?,?)", array(
+            sqlsrv_query($this->db, "insert into {$this->table} (username, password, role_id) values(?,?,?)", array(
                 $data['username'],
-                $data['nama'],
-                $data['level'],
-                password_hash($data['password'], PASSWORD_DEFAULT)
+                password_hash($data['password'], PASSWORD_DEFAULT),
+                $data['role_id']
             ));
         }
     }
@@ -80,28 +71,21 @@ password) values(?,?,?,?)", array(
     public function updateData($id, $data)
     {
         if ($this->driver == 'mysql') {
-            // query untuk update data
-            $query = $this->db->prepare("update {$this->table} set username = ?, nama = ?,
-    level = ?, password = ? where user_id = ?");
-            // binding parameter ke query
+            $query = $this->db->prepare("update {$this->table} set username = ?, password = ?, role_id = ? where user_id = ?");
             $query->bind_param(
-                'ssssi',
+                'ssii',
                 $data['username'],
-                $data['nama'],
-                $data['level'],
                 password_hash($data['password'], PASSWORD_DEFAULT),
+                $data['role_id'],
                 $id
             );
             // eksekusi query
             $query->execute();
         } else {
-            // query untuk update data
-            sqlsrv_query($this->db, "update {$this->table} set username = ?, nama = ?, level
-    = ?, password = ? where user_id = ?", [
+            sqlsrv_query($this->db, "update {$this->table} set username = ?, password = ?, role_id = ? where user_id = ?", [
                 $data['username'],
-                $data['nama'],
-                $data['level'],
                 password_hash($data['password'], PASSWORD_DEFAULT),
+                $data['role_id'],
                 $id
             ]);
         }

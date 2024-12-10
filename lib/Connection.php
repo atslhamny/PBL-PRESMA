@@ -3,10 +3,10 @@
 <?php
 // sql
 $use_driver = 'sqlsrv'; // mysql atau sqlsrv
-$host = 'localhost';
+$host = 'TOKOPEDIA';
 $username = ''; //'sa';
 $password = '';
-$database = 'dasar_web';
+$database = 'presma_fix';
 $db;
 
 
