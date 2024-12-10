@@ -10,6 +10,9 @@ if ($act == 'login') {
     $username = $_POST['username'];
     $password = $_POST['password'];
     include('../model/UserModel.php');
+
+    $userModel = new UserModel();
+    $data = $userModel->getSingleDataByKeyword('username', $username);
   
     if ($data) {
         // Jika password sesuai

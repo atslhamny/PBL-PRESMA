@@ -79,10 +79,9 @@ class UserModel extends Model
             // eksekusi query
             $query->execute();
         } else {
-            sqlsrv_query($this->db, "update {$this->table} set username = ?, password = ?, role_id = ? where user_id = ?", [
+            sqlsrv_query($this->db, "update {$this->table} set username = ?, password = ? where id = ?", [
                 $data['username'],
                 password_hash($data['password'], PASSWORD_DEFAULT),
-                $data['role_id'],
                 $id
             ]);
         }

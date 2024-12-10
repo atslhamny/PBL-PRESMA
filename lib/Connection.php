@@ -12,7 +12,7 @@ $db;
 
 if ($use_driver == 'mysql') {
     try {
-        $db = new mysqli($host, $username, $password, $database);
+        $db = new mysqli('localhost', $username, $password, $database);
         if ($db->connect_error) {
             die('Connection DB failed: ' . $db->connect_error);
         }

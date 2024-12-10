@@ -1,3 +1,20 @@
+<?php
+include('../lib/Session.php');
+$session = new Session();
+
+// Cek apakah user sudah login
+if (!$session->get('is_login')) {
+    header('Location: ../login.php');
+    exit();
+}
+
+// Cek apakah user memiliki role admin
+if ($session->get('role_id') != 1) {
+    header('Location: ../login.php');
+    exit();
+}
+?>
+
 <!-- dashboard admin -->
 
 <style>

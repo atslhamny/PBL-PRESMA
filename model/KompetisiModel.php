@@ -7,38 +7,67 @@ class KompetisiModel extends Model
 
 {
     protected $db;
-    protected $table = 'm_kategori';
+    protected $table = 'kompetisi';
     protected $driver;
     public function __construct()
     {
         require_once('../lib/Connection.php');
+        global $db, $use_driver;
         $this->db = $db;
         $this->driver = $use_driver;
     }
     public function insertData($data)
     {
         if ($this->driver == 'mysql') {
-            // prepare statement untuk query insert
-            $query = $this->db->prepare("insert into {$this->table} (kategori_kode,
-kategori_nama) values(?,?)");
-            // binding parameter ke query, "s" berarti string, "ss" berarti dua string
-            $query->bind_param('ss', $data['kategori_kode'], $data['kategori_nama']);
-            // eksekusi query untuk menyimpan ke database
+            $query = $this->db->prepare("INSERT INTO {$this->table} 
+                (id_jenis_kompetisi, id_tingkat_kompetisi, id_dosen, judul_kompetisi, 
+                judul_kompetisi_en, tempat_kompetisi, tempat_kompetisi_en, url_kompetisi,
+                tanggal_mulai, tanggal_akhir, jumlah_pt, jumlah_peserta, 
+                no_surat_tugas, tanggal_surat_tugas, file_surat_tugas, 
+                file_sertifikat, foto_kegiatan, file_poster, validasi, catatan, peran_dosen) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            $query->bind_param('iiisssssssiiissssssss',
+                $data['id_jenis_kompetisi'],
+                $data['id_tingkat_kompetisi'],
+                $data['id_dosen'],
+                $data['judul_kompetisi'],
+                $data['judul_kompetisi_en'],
+                $data['tempat_kompetisi'],
+                $data['tempat_kompetisi_en'],
+                $data['url_kompetisi'],
+                $data['tanggal_mulai'],
+                $data['tanggal_akhir'],
+                $data['jumlah_pt'],
+                $data['jumlah_peserta'],
+                $data['no_surat_tugas'],
+                $data['tanggal_surat_tugas'],
+                $data['file_surat_tugas'],
+                $data['file_sertifikat'],
+                $data['foto_kegiatan'],
+                $data['file_poster'],
+                $data['validasi'],
+                $data['catatan'],
+                $data['peran_dosen']
+            );
             $query->execute();
         } else {
-            // eksekusi query untuk menyimpan ke database
-            sqlsrv_query($this->db, "insert into {$this->table} (kategori_kode,
-kategori_nama) values(?,?)", array($data['kategori_kode'], $data['kategori_nama']));
+            sqlsrv_query($this->db, "INSERT INTO {$this->table} 
+                (id_jenis_kompetisi, id_tingkat_kompetisi, id_dosen, judul_kompetisi, 
+                judul_kompetisi_en, tempat_kompetisi, tempat_kompetisi_en, url_kompetisi,
+                tanggal_mulai, tanggal_akhir, jumlah_pt, jumlah_peserta, 
+                no_surat_tugas, tanggal_surat_tugas, file_surat_tugas, 
+                file_sertifikat, foto_kegiatan, file_poster, validasi, catatan, peran_dosen)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+                array_values($data));
         }
     }
     public function getData()
     {
         if ($this->driver == 'mysql') {
-            // query untuk mengambil data dari tabel
-            return $this->db->query("select * from {$this->table} ")->fetch_all(MYSQLI_ASSOC);
+            return $this->db->query("SELECT * FROM {$this->table}")->fetch_all(MYSQLI_ASSOC);
         } else {
-            // query untuk mengambil data dari tabel
-            $query = sqlsrv_query($this->db, "select * from {$this->table}");
+            $query = sqlsrv_query($this->db, "SELECT * FROM {$this->table}");
             $data = [];
             while ($row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
                 $data[] = $row;
@@ -49,59 +78,78 @@ kategori_nama) values(?,?)", array($data['kategori_kode'], $data['kategori_nama'
     public function getDataById($id)
     {
         if ($this->driver == 'mysql') {
-            // query untuk mengambil data berdasarkan id
-            $query = $this->db->prepare("select * from {$this->table} where kategori_id =
-?");
-            // binding parameter ke query "i" berarti integer. Biar tidak kena SQL Injection
+            $query = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
             $query->bind_param('i', $id);
-            // eksekusi query
             $query->execute();
             // ambil hasil query
             return $query->get_result()->fetch_assoc();
         } else {
-            // query untuk mengambil data berdasarkan id
-            $query = sqlsrv_query($this->db, "select * from {$this->table} where kategori_id
-= ?", [$id]);
-            // ambil hasil query
+            $query = sqlsrv_query($this->db, "SELECT * FROM {$this->table} WHERE id = ?", [$id]);
             return sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
         }
     }
     public function updateData($id, $data)
     {
         if ($this->driver == 'mysql') {
-            // query untuk update data
-            $query = $this->db->prepare("update {$this->table} set kategori_kode = ?,
-kategori_nama = ? where kategori_id = ?");
-            // binding parameter ke query
-            $query->bind_param('ssi', $data['kategori_kode'], $data['kategori_nama'], $id);
-            // eksekusi query
+            $query = $this->db->prepare("UPDATE {$this->table} SET 
+                id_jenis_kompetisi = ?, id_tingkat_kompetisi = ?, id_dosen = ?,
+                judul_kompetisi = ?, judul_kompetisi_en = ?, tempat_kompetisi = ?,
+                tempat_kompetisi_en = ?, url_kompetisi = ?, tanggal_mulai = ?,
+                tanggal_akhir = ?, jumlah_pt = ?, jumlah_peserta = ?,
+                no_surat_tugas = ?, tanggal_surat_tugas = ?, file_surat_tugas = ?,
+                file_sertifikat = ?, foto_kegiatan = ?, file_poster = ?,
+                validasi = ?, catatan = ?, peran_dosen = ?
+                WHERE id = ?");
+
+            $query->bind_param('iiisssssssiissssssssi',
+                $data['id_jenis_kompetisi'],
+                $data['id_tingkat_kompetisi'],
+                $data['id_dosen'],
+                $data['judul_kompetisi'],
+                $data['judul_kompetisi_en'],
+                $data['tempat_kompetisi'],
+                $data['tempat_kompetisi_en'],
+                $data['url_kompetisi'],
+                $data['tanggal_mulai'],
+                $data['tanggal_akhir'],
+                $data['jumlah_pt'],
+                $data['jumlah_peserta'],
+                $data['no_surat_tugas'],
+                $data['tanggal_surat_tugas'],
+                $data['file_surat_tugas'],
+                $data['file_sertifikat'],
+                $data['foto_kegiatan'],
+                $data['file_poster'],
+                $data['validasi'],
+                $data['catatan'],
+                $data['peran_dosen'],
+                $id
+            );
             $query->execute();
         } else {
-            // query untuk update data
-            sqlsrv_query($this->db, "update {$this->table} set kategori_kode = ?,
-kategori_nama = ? where kategori_id = ?", [
-                $data['kategori_kode'],
-                $data['kategori_nama'],
-                $id
-            ]);
+            $params = array_values($data);
+            $params[] = $id;
+            sqlsrv_query($this->db, "UPDATE {$this->table} SET 
+                id_jenis_kompetisi = ?, id_tingkat_kompetisi = ?, id_dosen = ?,
+                judul_kompetisi = ?, judul_kompetisi_en = ?, tempat_kompetisi = ?,
+                tempat_kompetisi_en = ?, url_kompetisi = ?, tanggal_mulai = ?,
+                tanggal_akhir = ?, jumlah_pt = ?, jumlah_peserta = ?,
+                no_surat_tugas = ?, tanggal_surat_tugas = ?, file_surat_tugas = ?,
+                file_sertifikat = ?, foto_kegiatan = ?, file_poster = ?,
+                validasi = ?, catatan = ?, peran_dosen = ?
+                WHERE id = ?", $params);
         }
     }
     public function deleteData($id)
     {
         if ($this->driver == 'mysql') {
-            // query untuk delete data
-            $query = $this->db->prepare("delete from {$this->table} where kategori_id = ?");
-            // binding parameter ke query
+            $query = $this->db->prepare("DELETE FROM {$this->table} WHERE id = ?");
             $query->bind_param('i', $id);
+            // eksekusi query
             // eksekusi query
             $query->execute();
         } else {
-            // query untuk delete data
-            sqlsrv_query(
-                $this->db,
-                "delete from {$this->table} where kategori_id = ?",
-                [$id]
-            );
+            sqlsrv_query($this->db, "DELETE FROM {$this->table} WHERE id = ?", [$id]);
         }
     }
 }
