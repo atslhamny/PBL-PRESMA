@@ -68,6 +68,17 @@ if ($session->get('is_login') === true) {
       background-color: #0056b3;
       border-color: #004085;
     }
+
+    .invalid-feedback {
+      display: block;
+      color: #dc3545;
+      font-size: 80%;
+      margin-top: 0.25rem;
+    }
+
+    .is-invalid {
+      border-color: #dc3545;
+    }
   </style>
 </head>
 
@@ -138,7 +149,8 @@ if ($session->get('is_login') === true) {
   <!-- AdminLTE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
   <!-- Form validation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.5/jquery.validate.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js" integrity="sha512-HXUqZYi1I5Ea6+ojC+1sIRFb6EAgCvykplfrF9GAYkQjdURzIK9E5l1VwKXBRbsjrAXJllY0VEdE/HPhSQ/AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <script>
     $(document).ready(function() {
       $('#form-login').validate({
@@ -152,6 +164,18 @@ if ($session->get('is_login') === true) {
             required: true,
             minlength: 5,
             maxlength: 255
+          }
+        },
+        messages: {
+          username: {
+            required: "Username wajib diisi",
+            minlength: "Username minimal 3 karakter",
+            maxlength: "Username maksimal 20 karakter"
+          },
+          password: {
+            required: "Password wajib diisi",
+            minlength: "Password minimal 5 karakter",
+            maxlength: "Password maksimal 255 karakter"
           }
         },
         errorElement: 'span',
