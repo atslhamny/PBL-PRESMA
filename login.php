@@ -68,6 +68,17 @@ if ($session->get('is_login') === true) {
       background-color: #0056b3;
       border-color: #004085;
     }
+
+    .invalid-feedback {
+      display: block;
+      color: #dc3545;
+      font-size: 80%;
+      margin-top: 0.25rem;
+    }
+
+    .is-invalid {
+      border-color: #dc3545;
+    }
   </style>
 </head>
 
@@ -79,7 +90,7 @@ if ($session->get('is_login') === true) {
       </div>
 
       <div class="card-body">
-        <p class="login-box-msg">Sign in to start your session</p>
+        <p class="login-box-msg">Silahkan Login Terlebih Dahulu</p>
 
         <!-- Menampilkan pesan flash jika login gagal -->
         <?php
@@ -103,10 +114,10 @@ if ($session->get('is_login') === true) {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" name="password" required>
+            <input type="password" class="form-control" placeholder="Password" name="password" id="password" required>
             <div class="input-group-append">
               <div class="input-group-text">
-                <span class="fas fa-lock"></span>
+                <span id="toggle-password" class="fas fa-eye"></span>
               </div>
             </div>
           </div>
@@ -138,7 +149,8 @@ if ($session->get('is_login') === true) {
   <!-- AdminLTE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
   <!-- Form validation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.5/jquery.validate.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js" integrity="sha512-HXUqZYi1I5Ea6+ojC+1sIRFb6EAgCvykplfrF9GAYkQjdURzIK9E5l1VwKXBRbsjrAXJllY0VEdE/HPhSQ/AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <script>
     $(document).ready(function() {
       $('#form-login').validate({
@@ -154,6 +166,18 @@ if ($session->get('is_login') === true) {
             maxlength: 255
           }
         },
+        messages: {
+          username: {
+            required: "Username wajib diisi",
+            minlength: "Username minimal 3 karakter",
+            maxlength: "Username maksimal 20 karakter"
+          },
+          password: {
+            required: "Password wajib diisi",
+            minlength: "Password minimal 5 karakter",
+            maxlength: "Password maksimal 255 karakter"
+          }
+        },
         errorElement: 'span',
         errorPlacement: function(error, element) {
           error.addClass('invalid-feedback');
@@ -164,6 +188,19 @@ if ($session->get('is_login') === true) {
         },
         unhighlight: function(element, errorClass, validClass) {
           $(element).removeClass('is-invalid');
+        }
+      });
+
+      // Show/Hide password functionality
+      $('#toggle-password').on('click', function() {
+        const passwordField = $('#password');
+        const passwordFieldType = passwordField.attr('type');
+        if (passwordFieldType === 'password') {
+          passwordField.attr('type', 'text'); // Ubah menjadi teks untuk menampilkan password
+          $(this).removeClass('fa-eye').addClass('fa-eye-slash'); // Ubah ikon menjadi mata tertutup
+        } else {
+          passwordField.attr('type', 'password'); // Ubah kembali menjadi password
+          $(this).removeClass('fa-eye-slash').addClass('fa-eye'); // Ubah ikon menjadi mata terbuka
         }
       });
     });
