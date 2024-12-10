@@ -24,9 +24,11 @@ if ($act == 'login') {
 
             // Redirect berdasarkan role_id
             if ($data['role_id'] == 1) {
-                header('Location: ../pages/dashboardAdmin.php', false); // Halaman admin
+                header('Location: ../pages/dashboardAdmin.php', false);
+                exit();
             } elseif ($data['role_id'] == 2) {
-                header('Location: ../pages/dashboard.php', false); // Halaman mahasiswa
+                header('Location: ../pages/dashboard.php', false);
+                exit();
             } else {
                 // Default redirect jika role_id tidak dikenal
                 echo "role_id tidak dikenal";

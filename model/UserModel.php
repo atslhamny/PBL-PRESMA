@@ -18,19 +18,17 @@ class UserModel extends Model
     public function insertData($data)
     {
         if ($this->driver == 'mysql') {
-            $query = $this->db->prepare("insert into {$this->table} (username, password, role_id) values(?,?,?)");
+            $query = $this->db->prepare("insert into {$this->table} (username, password) values(?,?)");
             $query->bind_param(
-                'ssi',
+                'ss',
                 $data['username'],
-                password_hash($data['password'], PASSWORD_DEFAULT),
-                $data['role_id']
+                password_hash($data['password'], PASSWORD_DEFAULT)
             );
             $query->execute();
         } else {
-            sqlsrv_query($this->db, "insert into {$this->table} (username, password, role_id) values(?,?,?)", array(
+            sqlsrv_query($this->db, "insert into {$this->table} (username, password) values(?,?)", array(
                 $data['username'],
-                password_hash($data['password'], PASSWORD_DEFAULT),
-                $data['role_id']
+                password_hash($data['password'], PASSWORD_DEFAULT)
             ));
         }
     }
@@ -53,7 +51,7 @@ class UserModel extends Model
     {
         if ($this->driver == 'mysql') {
             // query untuk mengambil data berdasarkan id
-            $query = $this->db->prepare("select * from {$this->table} where user_id = ?");
+            $query = $this->db->prepare("select * from {$this->table} where id = ?");
             // binding parameter ke query "i" berarti integer. Biar tidak kena SQL Injection
             $query->bind_param('i', $id);
             // eksekusi query
@@ -62,7 +60,7 @@ class UserModel extends Model
             return $query->get_result()->fetch_assoc();
         } else {
             // query untuk mengambil data berdasarkan id
-            $query = sqlsrv_query($this->db, "select * from {$this->table} where user_id =
+            $query = sqlsrv_query($this->db, "select * from {$this->table} where i =
     ?", [$id]);
             // ambil hasil query
             return sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
@@ -71,12 +69,11 @@ class UserModel extends Model
     public function updateData($id, $data)
     {
         if ($this->driver == 'mysql') {
-            $query = $this->db->prepare("update {$this->table} set username = ?, password = ?, role_id = ? where user_id = ?");
+            $query = $this->db->prepare("update {$this->table} set username = ?, password = ? where id = ?");
             $query->bind_param(
-                'ssii',
+                'ss',
                 $data['username'],
                 password_hash($data['password'], PASSWORD_DEFAULT),
-                $data['role_id'],
                 $id
             );
             // eksekusi query
@@ -94,14 +91,14 @@ class UserModel extends Model
     {
         if ($this->driver == 'mysql') {
             // query untuk delete data
-            $query = $this->db->prepare("delete from {$this->table} where user_id = ?");
+            $query = $this->db->prepare("delete from {$this->table} where id = ?");
             // binding parameter ke query
             $query->bind_param('i', $id);
             // eksekusi query
             $query->execute();
         } else {
             // query untuk delete data
-            sqlsrv_query($this->db, "delete from {$this->table} where user_id = ?", [$id]);
+            sqlsrv_query($this->db, "delete from {$this->table} where id = ?", [$id]);
         }
     }
     public function getSingleDataByKeyword($column, $keyword)
