@@ -1,155 +1,136 @@
-<!-- kategorimodel -->
-
 <?php
-include('Model.php');
 
-class KompetisiModel extends Model
-
+class KompetisiModel
 {
     protected $db;
-    protected $table = 'kompetisi';
-    protected $driver;
-    public function __construct()
-    {
-        require_once('../lib/Connection.php');
-        global $db, $use_driver;
-        $this->db = $db;
-        $this->driver = $use_driver;
-    }
-    public function insertData($data)
-    {
-        if ($this->driver == 'mysql') {
-            $query = $this->db->prepare("INSERT INTO {$this->table} 
-                (id_jenis_kompetisi, id_tingkat_kompetisi, id_dosen, judul_kompetisi, 
-                judul_kompetisi_en, tempat_kompetisi, tempat_kompetisi_en, url_kompetisi,
-                tanggal_mulai, tanggal_akhir, jumlah_pt, jumlah_peserta, 
-                no_surat_tugas, tanggal_surat_tugas, file_surat_tugas, 
-                file_sertifikat, foto_kegiatan, file_poster, validasi, catatan, peran_dosen) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-            $query->bind_param('iiisssssssiiissssssss',
-                $data['id_jenis_kompetisi'],
-                $data['id_tingkat_kompetisi'],
-                $data['id_dosen'],
-                $data['judul_kompetisi'],
-                $data['judul_kompetisi_en'],
-                $data['tempat_kompetisi'],
-                $data['tempat_kompetisi_en'],
-                $data['url_kompetisi'],
-                $data['tanggal_mulai'],
-                $data['tanggal_akhir'],
-                $data['jumlah_pt'],
-                $data['jumlah_peserta'],
-                $data['no_surat_tugas'],
-                $data['tanggal_surat_tugas'],
-                $data['file_surat_tugas'],
-                $data['file_sertifikat'],
-                $data['foto_kegiatan'],
-                $data['file_poster'],
-                $data['validasi'],
-                $data['catatan'],
-                $data['peran_dosen']
-            );
-            $query->execute();
-        } else {
-            sqlsrv_query($this->db, "INSERT INTO {$this->table} 
-                (id_jenis_kompetisi, id_tingkat_kompetisi, id_dosen, judul_kompetisi, 
-                judul_kompetisi_en, tempat_kompetisi, tempat_kompetisi_en, url_kompetisi,
-                tanggal_mulai, tanggal_akhir, jumlah_pt, jumlah_peserta, 
-                no_surat_tugas, tanggal_surat_tugas, file_surat_tugas, 
-                file_sertifikat, foto_kegiatan, file_poster, validasi, catatan, peran_dosen)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-                array_values($data));
-        }
-    }
-    public function getData()
+    public function __construct($db)
     {
-        if ($this->driver == 'mysql') {
-            return $this->db->query("SELECT * FROM {$this->table}")->fetch_all(MYSQLI_ASSOC);
-        } else {
-            $query = sqlsrv_query($this->db, "SELECT * FROM {$this->table}");
-            $data = [];
-            while ($row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
-                $data[] = $row;
-            }
-            return $data;
-        }
+        $this->db = $db;
     }
+
+    // Mendapatkan semua data kompetisi
+    public function getAllData()
+    {
+        $query = "SELECT 
+                      [id], 
+                      [jenis_kompetisi], 
+                      [tingkat_kompetisi], 
+                      [judul_kompetisi], 
+                      [judul_kompetisi_en], 
+                      [url_kompetisi], 
+                      [tanggal_mulai], 
+                      [tanggal_akhir], 
+                      [jumlah_pt], 
+                      [jumlah_peserta], 
+                      [no_surat_tugas], 
+                      [tanggal_surat], 
+                      [file_surat_tugas], 
+                      [file_sertifikat], 
+                      [foto_kegiatan], 
+                      [file_poster] 
+                  FROM [kompetisi]";
+        return $this->db->fetchAll($query);
+    }
+
+    // Mendapatkan data kompetisi berdasarkan ID
     public function getDataById($id)
     {
-        if ($this->driver == 'mysql') {
-            $query = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
-            $query->bind_param('i', $id);
-            $query->execute();
-            // ambil hasil query
-            return $query->get_result()->fetch_assoc();
-        } else {
-            $query = sqlsrv_query($this->db, "SELECT * FROM {$this->table} WHERE id = ?", [$id]);
-            return sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
-        }
+        $query = "SELECT * FROM [kompetisi] WHERE [id] = ?";
+        return $this->db->fetchOne($query, [$id]);
     }
+
+    // Menyimpan data kompetisi baru
+    public function insertData($data)
+    {
+        $query = "INSERT INTO [kompetisi] 
+                  ([jenis_kompetisi], [tingkat_kompetisi], [judul_kompetisi], [judul_kompetisi_en], 
+                   [url_kompetisi], [tanggal_mulai], [tanggal_akhir], [jumlah_pt], [jumlah_peserta], 
+                   [no_surat_tugas], [tanggal_surat], [file_surat_tugas], [file_sertifikat], 
+                   [foto_kegiatan], [file_poster]) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Mengambil file yang diupload dan mengkonversinya menjadi BLOB
+        $file_surat_tugas = isset($data['file_surat_tugas']) ? file_get_contents($data['file_surat_tugas']['tmp_name']) : null;
+        $file_sertifikat = isset($data['file_sertifikat']) ? file_get_contents($data['file_sertifikat']['tmp_name']) : null;
+        $foto_kegiatan = isset($data['foto_kegiatan']) ? file_get_contents($data['foto_kegiatan']['tmp_name']) : null;
+        $file_poster = isset($data['file_poster']) ? file_get_contents($data['file_poster']['tmp_name']) : null;
+
+        // Menyimpan data ke database
+        $this->db->execute($query, [
+            $data['jenis_kompetisi'],
+            $data['tingkat_kompetisi'],
+            $data['judul_kompetisi'],
+            $data['judul_kompetisi_en'],
+            $data['url_kompetisi'],
+            $data['tanggal_mulai'],
+            $data['tanggal_akhir'],
+            $data['jumlah_pt'],
+            $data['jumlah_peserta'],
+            $data['no_surat_tugas'],
+            $data['tanggal_surat'],
+            $file_surat_tugas,
+            $file_sertifikat,
+            $foto_kegiatan,
+            $file_poster
+        ]);
+    }
+
+    // Memperbarui data kompetisi yang ada
     public function updateData($id, $data)
     {
-        if ($this->driver == 'mysql') {
-            $query = $this->db->prepare("UPDATE {$this->table} SET 
-                id_jenis_kompetisi = ?, id_tingkat_kompetisi = ?, id_dosen = ?,
-                judul_kompetisi = ?, judul_kompetisi_en = ?, tempat_kompetisi = ?,
-                tempat_kompetisi_en = ?, url_kompetisi = ?, tanggal_mulai = ?,
-                tanggal_akhir = ?, jumlah_pt = ?, jumlah_peserta = ?,
-                no_surat_tugas = ?, tanggal_surat_tugas = ?, file_surat_tugas = ?,
-                file_sertifikat = ?, foto_kegiatan = ?, file_poster = ?,
-                validasi = ?, catatan = ?, peran_dosen = ?
-                WHERE id = ?");
+        $query = "UPDATE [kompetisi] 
+                  SET 
+                      [jenis_kompetisi] = ?, 
+                      [tingkat_kompetisi] = ?, 
+                      [judul_kompetisi] = ?, 
+                      [judul_kompetisi_en] = ?, 
+                      [url_kompetisi] = ?, 
+                      [tanggal_mulai] = ?, 
+                      [tanggal_akhir] = ?, 
+                      [jumlah_pt] = ?, 
+                      [jumlah_peserta] = ?, 
+                      [no_surat_tugas] = ?, 
+                      [tanggal_surat] = ?, 
+                      [file_surat_tugas] = ?, 
+                      [file_sertifikat] = ?, 
+                      [foto_kegiatan] = ?, 
+                      [file_poster] = ? 
+                  WHERE [id] = ?";
 
-            $query->bind_param('iiisssssssiissssssssi',
-                $data['id_jenis_kompetisi'],
-                $data['id_tingkat_kompetisi'],
-                $data['id_dosen'],
-                $data['judul_kompetisi'],
-                $data['judul_kompetisi_en'],
-                $data['tempat_kompetisi'],
-                $data['tempat_kompetisi_en'],
-                $data['url_kompetisi'],
-                $data['tanggal_mulai'],
-                $data['tanggal_akhir'],
-                $data['jumlah_pt'],
-                $data['jumlah_peserta'],
-                $data['no_surat_tugas'],
-                $data['tanggal_surat_tugas'],
-                $data['file_surat_tugas'],
-                $data['file_sertifikat'],
-                $data['foto_kegiatan'],
-                $data['file_poster'],
-                $data['validasi'],
-                $data['catatan'],
-                $data['peran_dosen'],
-                $id
-            );
-            $query->execute();
-        } else {
-            $params = array_values($data);
-            $params[] = $id;
-            sqlsrv_query($this->db, "UPDATE {$this->table} SET 
-                id_jenis_kompetisi = ?, id_tingkat_kompetisi = ?, id_dosen = ?,
-                judul_kompetisi = ?, judul_kompetisi_en = ?, tempat_kompetisi = ?,
-                tempat_kompetisi_en = ?, url_kompetisi = ?, tanggal_mulai = ?,
-                tanggal_akhir = ?, jumlah_pt = ?, jumlah_peserta = ?,
-                no_surat_tugas = ?, tanggal_surat_tugas = ?, file_surat_tugas = ?,
-                file_sertifikat = ?, foto_kegiatan = ?, file_poster = ?,
-                validasi = ?, catatan = ?, peran_dosen = ?
-                WHERE id = ?", $params);
-        }
+        // Mengambil file yang diupload dan mengkonversinya menjadi BLOB
+        $file_surat_tugas = isset($data['file_surat_tugas']) ? file_get_contents($data['file_surat_tugas']['tmp_name']) : null;
+        $file_sertifikat = isset($data['file_sertifikat']) ? file_get_contents($data['file_sertifikat']['tmp_name']) : null;
+        $foto_kegiatan = isset($data['foto_kegiatan']) ? file_get_contents($data['foto_kegiatan']['tmp_name']) : null;
+        $file_poster = isset($data['file_poster']) ? file_get_contents($data['file_poster']['tmp_name']) : null;
+
+        // Memperbarui data ke database
+        $this->db->execute($query, [
+            $data['jenis_kompetisi'],
+            $data['tingkat_kompetisi'],
+            $data['judul_kompetisi'],
+            $data['judul_kompetisi_en'],
+            $data['url_kompetisi'],
+            $data['tanggal_mulai'],
+            $data['tanggal_akhir'],
+            $data['jumlah_pt'],
+            $data['jumlah_peserta'],
+            $data['no_surat_tugas'],
+            $data['tanggal_surat'],
+            $file_surat_tugas,
+            $file_sertifikat,
+            $foto_kegiatan,
+            $file_poster,
+            $id
+        ]);
     }
+
+    // Menghapus data kompetisi berdasarkan ID
     public function deleteData($id)
     {
-        if ($this->driver == 'mysql') {
-            $query = $this->db->prepare("DELETE FROM {$this->table} WHERE id = ?");
-            $query->bind_param('i', $id);
-            // eksekusi query
-            // eksekusi query
-            $query->execute();
-        } else {
-            sqlsrv_query($this->db, "DELETE FROM {$this->table} WHERE id = ?", [$id]);
-        }
+        $query = "DELETE FROM [kompetisi] WHERE [id] = ?";
+        $this->db->execute($query, [$id]);
     }
 }
+
+

@@ -1,53 +1,76 @@
+auth.php
 
 <?php
-include('../lib/Session.php');
-include('../lib/Connection.php');
+include('../lib/Session.php');  // Memasukkan file Session.php yang berisi kelas Session
+$session = new Session();  // Membuat objek session
 
-$session = new Session();
-$act = isset($_GET['act']) ? strtolower($_GET['act']) : '';
+// Mulai sesi
+session_start();
 
-if ($act == 'login') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    include('../model/UserModel.php');
+// Cek aksi di URL
+if (isset($_GET['act'])) {
+    $action = $_GET['act'];
 
-    $userModel = new UserModel();
-    $data = $userModel->getSingleDataByKeyword('username', $username);
-  
-    if ($data) {
-        // Jika password sesuai
-        if (password_verify($password, $data['password'])) {
-            $session->set('is_login', true);
-            $session->set('username', $data['username']);
-            $session->set('role_id', $data['role_id']); // role_id menentukan peran
-            $session->commit();
+    try {
+        // Database configuration
+        $host = 'TOKOPEDIA'; // Ganti dengan nama server Anda
+        $dbname = 'presma_fix'; // Ganti dengan nama database Anda
+        $username = ''; // Ganti dengan username SQL Server Anda
+        $password = ''; // Ganti dengan password SQL Server Anda
 
-            // Redirect berdasarkan role_id
-            if ($data['role_id'] == 1) {
-                header('Location: ../pages/dashboardAdmin.php', false);
-                exit();
-            } elseif ($data['role_id'] == 2) {
-                header('Location: ../pages/dashboard.php', false);
-                exit();
-            } else {
-                // Default redirect jika role_id tidak dikenal
-                echo "role_id tidak dikenal";
+        // Membuat koneksi ke database
+        $db = new PDO("sqlsrv:Server=$host;Database=$dbname", $username, $password);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        if ($action === 'login') {
+            // Proses login
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $usernameInput = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+                $passwordInput = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+
+                // Query untuk mencari user berdasarkan username
+                $stmt = $db->prepare("SELECT password FROM users WHERE username = :username");
+                $stmt->bindParam(':username', $usernameInput);
+                $stmt->execute();
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                // Cek apakah user ditemukan
+                if ($row) {
+                    // Cek apakah password yang dimasukkan sesuai dengan password yang ada di database
+                    if ($passwordInput === $row['password']) {  // Menggunakan password biasa (bukan hash)
+                        $session->set('is_login', true);
+                        $session->set('username', $usernameInput);
+                        header('Location: ../index.php'); // Redirect ke index.php setelah login sukses
+                        exit();
+                    } else {
+                        // Jika password tidak cocok
+                        $session->setFlash('status', false);
+                        $session->setFlash('message', 'Username atau Password salah!');
+                        header('Location: ../login.php'); // Redirect ke login jika gagal
+                        exit();
+                    }
+                } else {
+                    // Jika user tidak ditemukan
+                    $session->setFlash('status', false);
+                    $session->setFlash('message', 'Username atau Password salah!');
+                    header('Location: ../login.php'); // Redirect ke login jika user tidak ditemukan
+                    exit();
+                }
             }
-        } else {
-            // Password salah
-            $session->setFlash('status', false);
-            $session->setFlash('message', 'Username atau password salah.');
-            $session->commit();
-            header('Location: ../login.php', false);
+        } elseif ($action === 'logout') {
+            // Proses logout
+            session_destroy();  // Hapus semua sesi
+            header('Location: ../login.php');  // Redirect ke halaman login setelah logout
+            exit();  // Hentikan eksekusi skrip
         }
-    } else {
-        // Username tidak ditemukan
-        $session->setFlash('status', false);
-        $session->setFlash('message', 'Username tidak ditemukan.');
-        $session->commit();
-        header('Location: ../login.php', false);
+    } catch (PDOException $e) {
+        // Tangani error koneksi database
+        error_log("Database connection error: " . $e->getMessage());
+        die("Koneksi gagal. Silakan coba lagi nanti.");
     }
-} else if ($act == 'logout') {
-    $session->deleteAll();
-    header('Location: ../landingPage.php', false);
+} else {
+    // Jika 'act' tidak ada dalam URL, redirect ke login
+    header('Location: ../login.php');
+    exit();
 }
+?>

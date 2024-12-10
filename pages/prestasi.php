@@ -1,9 +1,27 @@
-<!-- prestasi mahasiswa -->
-
 <?php
-require_once __DIR__ . '/../lib/Connection.php';
+require_once __DIR__ . '/../lib/Connection.php'; // Pastikan koneksi database sudah benar
 
-$kategori = getKategori();
+// Query untuk mengambil data dari tabel `mhs_kompetisi`
+$query = "
+    SELECT 
+        mk.id,
+        mk.id_mahasiswa,
+        mk.id_kompetisi,
+        mk.peran_mahasiswa,
+        m.nama AS nama_mahasiswa,
+        k.judul_kompetisi,
+        k.id_tingkat_kompetisi AS tingkat
+    FROM 
+        mhs_kompetisi mk
+    LEFT JOIN mahasiswa m ON mk.id_mahasiswa = m.id
+    LEFT JOIN kompetisi k ON mk.id_kompetisi = k.id
+"; // Sesuaikan nama tabel dan kolom sesuai struktur database Anda
+
+$result = sqlsrv_query($db, $query); // Menggunakan variabel $db dari Connection.php
+
+if (!$result) {
+    die(print_r(sqlsrv_errors(), true));
+}
 ?>
 
 <section class="content-header">
@@ -20,75 +38,46 @@ $kategori = getKategori();
     </div>
 </section>
 
-
 <!-- Main content -->
 <section class="content">
     <div class="card">
         <div class="card-header">
             <h4><b>Daftar Prestasi</b></h4>
-            <!-- <br> -->
-            <p>Mahasiswa Politeknik Negeri Malang disiapkan untuk dapat bekerja maupun menjadi wirausaha yang sukses. Untuk itu, aktif dalam berbagai kegiatan lomba merupakan salah satu cara untuk mengasah kemampuan dan bakat para mahasiswa. Berikut beberapa prestasi yang telah diraih para mahasiswa dalam dekade terakhir</p>
+            <p>Berikut adalah daftar prestasi mahasiswa yang telah terdaftar:</p>
         </div>
 
-        <!-- tabel -->
+        <!-- Tabel -->
         <div class="card-body">
             <table class="table table-sm table-bordered table-striped" id="table-data">
                 <thead>
                     <tr>
-                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">No</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Nama</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Judul Kompetisi</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Tahun</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Peringkat</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Tingkat</th>
+                        <th>No</th>
+                        <th>ID Mahasiswa</th>
+                        <th>Nama Mahasiswa</th>
+                        <th>Judul Kompetisi</th>
+                        <th>Tahun</th>
+                        <th>Tingkat</th>
+                        <th>Peran Mahasiswa</th>
                     </tr>
                 </thead>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">1</td>
-                    <td>Atsila</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="even">
-                    <td class="dtr-control sorting_1" tabindex="0">2</td>
-                    <td>Rheina</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Afgan</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Bimantara</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Puput</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
+                <tbody>
+                    <?php
+                    $no = 1;
+                    while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+                        echo "<tr>";
+                        echo "<td>" . $no++ . "</td>";
+                        echo "<td>" . htmlspecialchars($row['id_mahasiswa']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['nama_mahasiswa']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['judul_kompetisi']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['tingkat']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['peran_mahasiswa']) . "</td>";
+                        echo "</tr>";
+                    }
+                    ?>
                 </tbody>
             </table>
         </div>
-
-        <!-- tutup tabel -->
-
+        <!-- Tabel End -->
     </div>
 </section>
 
@@ -110,4 +99,3 @@ $kategori = getKategori();
         });
     });
 </script>
-
