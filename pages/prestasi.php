@@ -1,21 +1,23 @@
 <?php
 require_once __DIR__ . '/../lib/Connection.php'; // Pastikan koneksi database sudah benar
 
-// Query untuk mengambil data dari tabel `mhs_kompetisi`
+// Query untuk mengambil data yang sesuai
 $query = "
     SELECT 
         mk.id,
         mk.id_mahasiswa,
-        mk.id_kompetisi,
         mk.peran_mahasiswa,
         m.nama AS nama_mahasiswa,
         k.judul_kompetisi,
-        k.id_tingkat_kompetisi AS tingkat
+        YEAR(k.tanggal_akhir) AS tahun,
+        tk.tingkat_kompetisi AS tingkat
     FROM 
         mhs_kompetisi mk
     LEFT JOIN mahasiswa m ON mk.id_mahasiswa = m.id
     LEFT JOIN kompetisi k ON mk.id_kompetisi = k.id
-"; // Sesuaikan nama tabel dan kolom sesuai struktur database Anda
+    LEFT JOIN tingkat_kompetisi tk ON k.id_tingkat_kompetisi = tk.id
+    ORDER BY tahun DESC, m.nama ASC
+"; // Pastikan tabel dan kolom sesuai dengan struktur database Anda
 
 $result = sqlsrv_query($db, $query); // Menggunakan variabel $db dari Connection.php
 
@@ -52,7 +54,6 @@ if (!$result) {
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>ID Mahasiswa</th>
                         <th>Nama Mahasiswa</th>
                         <th>Judul Kompetisi</th>
                         <th>Tahun</th>
@@ -66,11 +67,11 @@ if (!$result) {
                     while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
                         echo "<tr>";
                         echo "<td>" . $no++ . "</td>";
-                        echo "<td>" . htmlspecialchars($row['id_mahasiswa']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['nama_mahasiswa']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['judul_kompetisi']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['tingkat']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['peran_mahasiswa']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['nama_mahasiswa'] ?? '-') . "</td>";
+                        echo "<td>" . htmlspecialchars($row['judul_kompetisi'] ?? '-') . "</td>";
+                        echo "<td>" . htmlspecialchars($row['tahun'] ?? '-') . "</td>";
+                        echo "<td>" . htmlspecialchars($row['tingkat'] ?? '-') . "</td>";
+                        echo "<td>" . htmlspecialchars($row['peran_mahasiswa'] ?? '-') . "</td>";
                         echo "</tr>";
                     }
                     ?>
