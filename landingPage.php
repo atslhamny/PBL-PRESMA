@@ -84,14 +84,14 @@
         .footer {
             margin-top: auto;
             background-color: 004aad;
-            
+
         }
     </style>
-    
+
     <footer class="footer bg-primary text-white text-center py-3 mt-auto">
         <div class="container">
-            <p class="mb-1">&copy; 2024 <strong>PresMa Polinema</strong    <a href="#" class="text-decoration-none text-white"> | Kebijakan Privasi</a></p>
-        
+            <p class="mb-1">&copy; 2024 <strong>PresMa Polinema</strong <a href="#" class="text-decoration-none text-white"> | Kebijakan Privasi</a></p>
+
         </div>
     </footer>
 

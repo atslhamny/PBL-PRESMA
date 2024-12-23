@@ -1,207 +1,168 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();  // Hanya panggil session_start jika sesi belum dimulai
+}
 require_once __DIR__ . '/../lib/Connection.php';
 
-// // Ambil data kategori jika diperlukan (untuk kategori kompetisi, dll)
-// $kategori = getKategori(); // Gantilah sesuai kebutuhan
+// Memeriksa apakah pengguna sudah login dengan memeriksa session 'user_id'
+if (!isset($_SESSION['user_id'])) {
+    die('Anda harus login untuk melihat data kompetisi.');
+}
+// Mendapatkan user_id dari sesi
+$userId = $_SESSION['user_id'];
+
+// Query untuk mencari ID mahasiswa berdasarkan user_id yang sedang login
+$queryMahasiswa = "
+SELECT id 
+FROM mahasiswa 
+WHERE user_id = ?
+";
+
+// Menyiapkan dan mengeksekusi query untuk mendapatkan ID mahasiswa
+$stmtMahasiswa = sqlsrv_prepare($db, $queryMahasiswa, array($userId));
+if ($stmtMahasiswa === false || !sqlsrv_execute($stmtMahasiswa)) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Mengambil ID mahasiswa dari hasil query
+$mahasiswa = sqlsrv_fetch_array($stmtMahasiswa, SQLSRV_FETCH_ASSOC);
+if (!$mahasiswa) {
+    die('Data mahasiswa tidak ditemukan.');
+}
+
+$mahasiswaId = $mahasiswa['id'];  // Menyimpan ID mahasiswa
+
+// Query untuk mengambil data kompetisi berdasarkan ID mahasiswa
+$query = "
+SELECT 
+    k.id, 
+    m.nama, 
+    k.judul_kompetisi, 
+    k.catatan,
+    k.gelar,
+    k.status,
+    YEAR(k.tanggal_mulai) AS tahun
+FROM kompetisi k
+JOIN mahasiswa m ON k.id_mahasiswa = m.id
+JOIN tingkat_kompetisi t ON k.id_tingkat_kompetisi = t.id
+WHERE k.id_mahasiswa = ?
+ORDER BY k.tanggal_mulai DESC
+";
+
+// Menyiapkan dan mengeksekusi query untuk mengambil data kompetisi
+$stmt = sqlsrv_prepare($db, $query, array($mahasiswaId));
+if ($stmt === false || !sqlsrv_execute($stmt)) {
+    die(print_r(sqlsrv_errors(), true));
+}
 ?>
 
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Daftar Kompetisi</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Kompetisi</li>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestasi Mahasiswa</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <section class="content-header">
+        <div class="card">
+            <div class="col-sm-12" style="padding: 10px;">
+                <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
+                    <li class="breadcrumb-item">
+                        <span class="fas fa-home" style="margin-right: 5px;"></span>
+                        <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
+                    </li>
+                    <li class="breadcrumb-item active">Prestasi Mahasiswa</li>
                 </ol>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Main content -->
-<section class="content">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Daftar Kompetisi</h3>
-            <div class="card-tools">
-                <button type="button" class="btn btn-md btn-primary" onclick="tambahData()">
-                    Tambah Kompetisi
-                </button>
+    <section class="content">
+        <div class="card">
+            <div class="card-header" style="background-color: white;">
+                <h4><b>Daftar Prestasi</b></h4>
+                <p>Berikut adalah daftar prestasi yang telah diraih oleh Anda dalam berbagai kompetisi.</p>
+                <a href="index.php?page=tambah"><button type="button" class="btn btn-md btn-primary" style="float: right;">Tambah Data</button></a>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-bordered table-striped" id="table-data">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">No</th>
+                            <th>Nama Mahasiswa</th>
+                            <th>Judul Kompetisi</th>
+                            <th>Tahun</th>
+                            <th>Peringkat</th>
+                            <th>Catatan</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                            echo "<tr>
+                            <td style='text-align: center;'>{$no}</td>
+                            <td>{$row['nama']}</td>
+                            <td>{$row['judul_kompetisi']}</td>
+                            <td>{$row['tahun']}</td>
+                            <td>{$row['gelar']}</td>
+                            <td>{$row['catatan']}</td>
+                            <td>";
+                            switch ($row['status']) {
+                                case 'Pending':
+                                    echo "<span class='text-warning'><i class='fas fa-hourglass-half'></i> Pending</span>";
+                                    break;
+                                case 'Diterima':
+                                    echo "<span class='text-success'><i class='fas fa-check-circle'></i> Diterima</span>";
+                                    break;
+                                case 'Ditolak':
+                                    echo "<span class='text-danger'><i class='fas fa-times-circle'></i> Ditolak</span>";
+                                    break;
+                                default:
+                                    echo "<span class='text-muted'><i class='fas fa-question-circle'></i> Tidak Diketahui</span>";
+                                    break;
+                            }
+                            echo "</td></tr>";
+                            $no++;
+                        }
+                        ?>
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="card-body">
-            <table class="table table-sm table-bordered table-striped" id="table-data">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Jenis Kompetisi</th>
-                        <th>Tingkat Kompetisi</th>
-                        <th>Judul Kompetisi</th>
-                        <th>URL Kompetisi</th>
-                        <th>Tanggal Mulai</th>
-                        <th>Tanggal Akhir</th>
-                        <th>Jumlah Peserta</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- Modal Form -->
-<div class="modal fade" id="form-data" style="display: none;" aria-hidden="true">
-    <form action="action/KompetisiAction.php?act=save" method="post" id="form-tambah" enctype="multipart/form-data">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Tambah Kompetisi</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Jenis Kompetisi</label>
-                        <select id="jenis_kompetisi" name="jenis_kompetisi" class="form-control">
-                            <option value="Lomba Ilmiah">Lomba Ilmiah</option>
-                            <option value="Hackathon">Hackathon</option>
-                            <option value="Olimpiade">Olimpiade</option>
-                            <option value="Debat">Debat</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Tingkat Kompetisi</label>
-                        <select id="tingkat_kompetisi" name="tingkat_kompetisi" class="form-control">
-                            <option value="Lokal">Lokal</option>
-                            <option value="Nasional">Nasional</option>
-                            <option value="Internasional">Internasional</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Judul Kompetisi</label>
-                        <input type="text" class="form-control" name="judul_kompetisi" id="judul_kompetisi">
-                    </div>
-                    <div class="form-group">
-                        <label>URL Kompetisi</label>
-                        <input type="text" class="form-control" name="url_kompetisi" id="url_kompetisi">
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Mulai</label>
-                        <input type="date" class="form-control" name="tanggal_mulai" id="tanggal_mulai">
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Akhir</label>
-                        <input type="date" class="form-control" name="tanggal_akhir" id="tanggal_akhir">
-                    </div>
-                    <div class="form-group">
-                        <label>Jumlah Peserta</label>
-                        <input type="number" class="form-control" name="jumlah_peserta" id="jumlah_peserta">
-                    </div>
-                    <div class="form-group">
-                        <label>File Surat Tugas</label>
-                        <input type="file" class="form-control" name="file_surat_tugas" id="file_surat_tugas" accept=".pdf, .docx, .pptx">
-                    </div>
-                    <div class="form-group">
-                        <label>File Sertifikat</label>
-                        <input type="file" class="form-control" name="file_sertifikat" id="file_sertifikat" accept=".pdf, .docx, .pptx">
-                    </div>
-                    <div class="form-group">
-                        <label>Foto Kegiatan</label>
-                        <input type="file" class="form-control" name="foto_kegiatan" id="foto_kegiatan" accept="image/jpeg, image/jpg, image/png" onchange="previewImage('foto_kegiatan', 'preview-foto-kegiatan')">
-                        <img id="preview-foto-kegiatan" style="display:none;" alt="Image Preview" width="150">
-                    </div>
-                    <div class="form-group">
-                        <label>File Poster</label>
-                        <input type="file" class="form-control" name="file_poster" id="file_poster" accept=".pdf, .docx, .pptx">
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
-
-<script>
-    // Function to preview image files (only jpg, png, jpeg)
-    function previewImage(inputId, previewId) {
-        const file = document.getElementById(inputId).files[0];
-        const preview = document.getElementById(previewId);
-        const validExtensions = ['image/jpeg', 'image/jpg', 'image/png']; // Valid image file types
-
-        // Check if file is an image and is of the correct type
-        if (file && validExtensions.includes(file.type)) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.style.display = 'block';
-                preview.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.style.display = 'none'; // Hide preview if file type is invalid
-            alert("Please upload a valid image file (jpg, jpeg, png).");
-        }
-    }
-
-    // Function to preview non-image files (like PDFs, DOCX, PPTX)
-    function previewFile(inputId, previewId) {
-        const file = document.getElementById(inputId).files[0];
-        const preview = document.getElementById(previewId);
-
-        if (file) {
-            // Check file type and allow only PDF, DOCX, and PPTX as example
-            const validExtensions = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
-
-            if (validExtensions.includes(file.type)) {
-                preview.textContent = file.name; // Show file name for non-image files
-            } else {
-                preview.textContent = ''; // Clear preview if invalid file type
-                alert("Invalid file type. Only PDF, DOCX, or PPTX files are allowed.");
-            }
-        } else {
-            preview.textContent = ''; // Clear preview if no file is selected
-        }
-    }
-
-    function tambahData() {
-        $('#form-data').modal('show');
-        $('#form-tambah').attr('action', 'action/KompetisiAction.php?act=save');
-        // Reset form and preview areas
-        $('#form-tambah')[0].reset();
-        $('#preview-foto-kegiatan').hide();
-        $('#preview-poster').hide();
-        $('#preview-surat-tugas').text('');
-        $('#preview-sertifikat').text('');
-    }
-
-    function editData(id) {
-        $.ajax({
-            url: 'action/KompetisiAction.php?act=get&id=' + id,
-            method: 'post',
-            success: function(response) {
-                var data = JSON.parse(response);
-                $('#form-data').modal('show');
-                $('#form-tambah').attr('action', 'action/KompetisiAction.php?act=update&id=' + id);
-                $('#jenis_kompetisi').val(data.jenis_kompetisi);
-                $('#tingkat_kompetisi').val(data.tingkat_kompetisi);
-                $('#judul_kompetisi').val(data.judul_kompetisi);
-                $('#url_kompetisi').val(data.url_kompetisi);
-                $('#tanggal_mulai').val(data.tanggal_mulai);
-                $('#tanggal_akhir').val(data.tanggal_akhir);
-                $('#jumlah_peserta').val(data.jumlah_peserta);
-                // You can set file previews based on the current data, if needed
-            }
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#table-data').DataTable({
+                responsive: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                pageLength: 10,
+                language: {
+                    paginate: {
+                        previous: "Previous",
+                        next: "Next"
+                    },
+                    lengthMenu: "Show _MENU_ entries",
+                    search: "Search:"
+                }
+            });
         });
-    }
+    </script>
+</body>
 
-    $(document).ready(function() {
-        $('#table-data').DataTable({
-            ajax: 'action/KompetisiAction.php?act=load',
-        });
-    });
-</script>
+</html>

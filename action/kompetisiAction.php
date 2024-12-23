@@ -2,7 +2,7 @@
 include('../lib/Session.php');
 include_once('../lib/Connection.php');
 include_once('../lib/Secure.php');
-include('../models/KompetisiModel.php');
+include('../model/KompetisiModel.php');
 
 // Session initialization
 $session = new Session();

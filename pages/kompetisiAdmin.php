@@ -1,3 +1,28 @@
+<?php
+require_once __DIR__ . '/../lib/Connection.php';
+
+// Query untuk mengambil data dari database
+$query = "
+SELECT 
+    k.id, 
+    m.nama, 
+    k.judul_kompetisi, 
+    k.catatan,
+    YEAR(k.tanggal_mulai) AS tahun
+FROM kompetisi k
+JOIN mhs_kompetisi mk ON k.id = mk.id_kompetisi
+JOIN mahasiswa m ON mk.id_mahasiswa = m.id
+JOIN tingkat_kompetisi t ON k.id_tingkat_kompetisi = t.id
+ORDER BY k.tanggal_mulai DESC
+";
+
+$stmt = sqlsrv_query($db, $query);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+?>
+
 <!-- kategori mahasiswa -->
 
 <section class="content-header">
@@ -17,7 +42,7 @@
 <!-- Main content -->
 <section class="content">
     <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="background-color: white;">
             <div class="deskripsi">
                 <h4><b>Daftar Kompetisi</b></h4>
                 <p>
@@ -26,107 +51,61 @@
                     mempersiapkan mahasiswa menjadi individu yang unggul, inovatif, dan siap berkontribusi di dunia
                     industri.
                 </p>
-            </div>
-            <div class="card-tools">
-                <a href="index.php?page=input" class="btn btn-md-right btn-primary text-white">Tambah Data</a>
+
             </div>
         </div>
-        <div class="card-body">
-            <!-- tabel -->
+
+        <!-- Tabel Kompetisi -->
         <div class="card-body">
             <table class="table table-sm table-bordered table-striped" id="table-data">
                 <thead>
                     <tr>
-                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">No</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Judul Kompetisi</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Keterangan</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Edit/Detail</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Hapus</th>
+                        <th style="text-align: center;">No</th>
+                        <th>Judul Kompetisi</th>
+                        <th>Keterangan</th>
+                        <th>Tahun</th>
+                        <th style="text-align: center;">Detail</th>
+                        <th style="text-align: center;">Hapus</th>
                     </tr>
                 </thead>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">1</td>
-                    <td>Bussiness Plan</td>
-                    <td>Keterangan</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
-                            <i class="fas fa-clipboard-list"></i>
-                        </button>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="even">
-                    <td class="dtr-control sorting_1" tabindex="0">2</td>
-                    <td>Bussiness Plan</td>
-                    <td>Keterangan</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
-                            <i class="fas fa-clipboard-list"></i>
-                        </button>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Bussiness Plan</td>
-                    <td>Keterangan</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
-                            <i class="fas fa-clipboard-list"></i>
-                        </button>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Bussiness Plan</td>
-                    <td>Keterangan</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
-                            <i class="fas fa-clipboard-list"></i>
-                        </button>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Bussiness Plan</td>
-                    <td>Keterangan</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-primary btn-sm" onclick="showDetails(1)">
-                            <i class="fas fa-clipboard-list"></i>
-                        </button>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
+                <tbody>
+                    <?php
+                    $no = 1;
+                    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                        echo "
+        <tr>
+            <td style='text-align: center;'>$no</td>
+            <td>{$row['judul_kompetisi']}</td>
+            <td>{$row['catatan']}</td>
+            <td>{$row['tahun']}</td>
+            <td style='text-align: center;'>
+                <a href='index.php?page=detail&id={$row['id']}' class='btn btn-primary btn-sm'>
+                    <i class='fa fa-edit'></i>
+                </a>
+            </td>
+            <td style='text-align: center;'>
+                <button type='button' class='btn btn-danger btn-sm' onclick='deleteRow({$row['id']})'>
+                    <i class='fa fa-trash'></i>
+                </button>
+            </td>
+        </tr>
+        ";
+                        $no++;
+                    }
+
+                    // Jika tidak ada data
+                    if ($no === 1) {
+                        echo "<tr><td colspan='7' style='text-align: center;'>Tidak ada data</td></tr>";
+                    }
+                    ?>
                 </tbody>
+
             </table>
         </div>
 
-        <!-- tutup tabel -->
-        </div>
     </div>
 </section>
+
 <script>
     $(document).ready(function() {
         $('#table-data').DataTable({

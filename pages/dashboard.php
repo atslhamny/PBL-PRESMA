@@ -1,5 +1,4 @@
 <!-- dashboard mahasiswa -->
-
 <style>
     /* General styling */
     .breadcrumb {
@@ -12,7 +11,6 @@
         text-decoration: none;
         color: inherit;
     }
-
 
     .info-box {
         display: flex;
@@ -43,7 +41,6 @@
         border-radius: 8px;
         margin-bottom: 20px;
         background-color: white;
-
     }
 
     .card img {
@@ -126,7 +123,7 @@
             <h4><b style="color: #03618D;">Selamat Datang Rheina Putri,</b> Anda login sebagai Mahasiswa</h4>
         </div>
 
-        <div class="row" style="justify-content: center; padding:15px;">
+        <div class="row" style="justify-content: center; padding: 15px;">
             <div class="col-lg-4 col-6">
                 <!-- small box -->
                 <div class="small-box bg-lightblue" style="border-radius: 20px;">
@@ -137,10 +134,12 @@
                     <div class="icon" style="padding: 5px;">
                         <i class="fas fa-trophy"></i>
                     </div>
-                    <a href="pages/kompetisi.php" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="index.php?page=kompetisi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
-            <!-- ./col -->
+
             <div class="col-lg-4 col-6">
                 <!-- small box -->
                 <div class="small-box bg-maroon" style="border-radius: 20px;">
@@ -151,10 +150,12 @@
                     <div class="icon" style="padding: 5px;">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <a href="pages/prestasi.php" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="index.php?page=prestasi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
-            <!-- ./col -->
+
             <div class="col-lg-4 col-6">
                 <!-- small box -->
                 <div class="small-box bg-warning" style="border-radius: 20px;">
@@ -165,82 +166,18 @@
                     <div class="icon" style="padding: 5px;">
                         <i class="fas fa-medal"></i>
                     </div>
-                    <a href="pages/prestasi.php" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="index.php?page=prestasi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
             </div>
-
         </div>
-        <!-- tabel section -->
-        <!-- tabel -->
-        <div class="card-body">
-            <table class="table table-sm table-bordered table-striped" id="table-data">
-                <thead>
-                    <tr>
-                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">No</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Nama</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Judul Kompetisi</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Tahun</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Peringkat</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Tingkat</th>
-                    </tr>
-                </thead>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">1</td>
-                    <td>Atsila</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="even">
-                    <td class="dtr-control sorting_1" tabindex="0">2</td>
-                    <td>Rheina</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Afgan</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Bimantara</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Puput</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- tutup tabel -->
 
         <!-- Berita section -->
         <div class="berita">
-            <h3 class="berita-header">
-                <b>Berita Terbaru</b>
-
-            </h3>
-
+            <h3 class="berita-header"><b>Berita Terbaru</b></h3>
             <div style="display: flex; gap: 25px;">
                 <div class="card">
-
-
                     <img src="img/berita.jpg" alt="Berita image">
                     <div class="card-body">
                         <h6 class="card-title">Mahasiswa Polinema</h6>
@@ -248,8 +185,8 @@
                         <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
                     </div>
                 </div>
-                <div class="card">
 
+                <div class="card">
                     <img src="img/berita.jpg" alt="Berita image">
                     <div class="card-body">
                         <h6 class="card-title">Mahasiswa Polinema</h6>
@@ -257,8 +194,8 @@
                         <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
                     </div>
                 </div>
-                <div class="card">
 
+                <div class="card">
                     <img src="img/berita.jpg" alt="Berita image">
                     <div class="card-body">
                         <h6 class="card-title">Mahasiswa Polinema</h6>
@@ -266,11 +203,8 @@
                         <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
                     </div>
                 </div>
+
                 <div class="card">
-                    <!-- icon hapus -->
-                    <span style="position: absolute; top: 13px; right: 13px; cursor: pointer; color: #fff; padding: 5px; border-radius: 50%;">
-                        <i class="fas fa-trash"></i>
-                    </span>
                     <img src="img/berita.jpg" alt="Berita image">
                     <div class="card-body">
                         <h6 class="card-title">Mahasiswa Polinema</h6>
@@ -280,55 +214,10 @@
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('visitors-chart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-            datasets: [{
-                    label: 'This Week',
-                    data: [100, 200, 300, 400, 500, 600, 700],
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    fill: true
-                },
-                {
-                    label: 'Last Week',
-                    data: [90, 180, 270, 350, 420, 550, 680],
-                    borderColor: '#808080',
-                    backgroundColor: 'rgba(128, 128, 128, 0.1)',
-                    fill: true
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    const ctxDonut = document.getElementById('donutChart').getContext('2d');
-    new Chart(ctxDonut, {
-        type: 'doughnut',
-        data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple'],
-            datasets: [{
-                data: [20, 15, 25, 30, 10],
-                backgroundColor: ['#f56954', '#3c8dbc', '#f39c12', '#00a65a', '#605ca8']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-</script>
 <script>
     $(document).ready(function() {
         $('#table-data').DataTable({

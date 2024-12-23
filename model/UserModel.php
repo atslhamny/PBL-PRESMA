@@ -1,19 +1,15 @@
-
 <?php
 include('Model.php');
 
 class UserModel extends Model
 {
     protected $db;
-    protected $table = 'users';
+    protected $table = 'user';
     protected $driver;
 
-    public function __construct()
+    public function __construct($connection)
     {
-        require_once('../lib/Connection.php');
-        global $db, $use_driver;
-        $this->db = $db;
-        $this->driver = $use_driver;
+        $this->db = $connection;
     }
 
     // Implementasi metode CRUD
@@ -62,5 +58,47 @@ class UserModel extends Model
             sqlsrv_query($this->db, $query, [$id]);
         }
     }
+
+    // Menambahkan fungsi getSingleDataByKeyword ke dalam kelas UserModel
+    public function getSingleDataByKeyword($column, $value)
+    {
+        $query = "SELECT * FROM users WHERE $column = ?";
+        $params = [$value];
+        $stmt = sqlsrv_prepare($this->db, $query, $params);
+
+        if ($stmt === false) {
+            $errors = sqlsrv_errors();
+            throw new Exception("Persiapan query gagal: " . $errors[0]['message']);
+        }
+
+        $result = sqlsrv_execute($stmt);
+
+        if ($result === false) {
+            $errors = sqlsrv_errors();
+            throw new Exception("Eksekusi query gagal: " . $errors[0]['message']);
+        }
+
+        $user = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+        return $user;
+    }
+
+    // Fungsi untuk validasi user
+    public function validateUser($username, $password)
+    {
+        try {
+            $user = $this->getSingleDataByKeyword('username', $username);
+
+            if (!$user) {
+                return false;
+            }
+
+            // Untuk sementara, perbandingan password biasa
+            // Nantinya gunakan password_hash() dan password_verify()
+            return ($password === $user['password']) ? $user : false;
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return false;
+        }
+    }
 }
-?>

@@ -1,76 +1,51 @@
-auth.php
-
 <?php
-include('../lib/Session.php');  // Memasukkan file Session.php yang berisi kelas Session
-$session = new Session();  // Membuat objek session
+require_once __DIR__ . '/../lib/Connection.php'; // Pastikan path file Connection.php benar
 
-// Mulai sesi
-session_start();
+// Mendapatkan input dari form login
+$username = $_POST['username'];
+$password = $_POST['password'];
 
-// Cek aksi di URL
-if (isset($_GET['act'])) {
-    $action = $_GET['act'];
+// Query untuk memverifikasi pengguna berdasarkan username dan password
+$query = "SELECT * FROM [user] WHERE [username] = ? AND [password] = ?";
 
-    try {
-        // Database configuration
-        $host = 'TOKOPEDIA'; // Ganti dengan nama server Anda
-        $dbname = 'presma_fix'; // Ganti dengan nama database Anda
-        $username = ''; // Ganti dengan username SQL Server Anda
-        $password = ''; // Ganti dengan password SQL Server Anda
+// Menyiapkan parameter untuk query
+$params = array($username, $password);
 
-        // Membuat koneksi ke database
-        $db = new PDO("sqlsrv:Server=$host;Database=$dbname", $username, $password);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Eksekusi query
+$stmt = sqlsrv_query($db, $query, $params);
 
-        if ($action === 'login') {
-            // Proses login
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $usernameInput = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-                $passwordInput = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+// Periksa apakah query berhasil
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true)); // Tampilkan pesan error jika query gagal
+}
 
-                // Query untuk mencari user berdasarkan username
-                $stmt = $db->prepare("SELECT password FROM users WHERE username = :username");
-                $stmt->bindParam(':username', $usernameInput);
-                $stmt->execute();
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+// Mengecek apakah pengguna ditemukan
+if (sqlsrv_has_rows($stmt)) {
+    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
-                // Cek apakah user ditemukan
-                if ($row) {
-                    // Cek apakah password yang dimasukkan sesuai dengan password yang ada di database
-                    if ($passwordInput === $row['password']) {  // Menggunakan password biasa (bukan hash)
-                        $session->set('is_login', true);
-                        $session->set('username', $usernameInput);
-                        header('Location: ../index.php'); // Redirect ke index.php setelah login sukses
-                        exit();
-                    } else {
-                        // Jika password tidak cocok
-                        $session->setFlash('status', false);
-                        $session->setFlash('message', 'Username atau Password salah!');
-                        header('Location: ../login.php'); // Redirect ke login jika gagal
-                        exit();
-                    }
-                } else {
-                    // Jika user tidak ditemukan
-                    $session->setFlash('status', false);
-                    $session->setFlash('message', 'Username atau Password salah!');
-                    header('Location: ../login.php'); // Redirect ke login jika user tidak ditemukan
-                    exit();
-                }
-            }
-        } elseif ($action === 'logout') {
-            // Proses logout
-            session_destroy();  // Hapus semua sesi
-            header('Location: ../login.php');  // Redirect ke halaman login setelah logout
-            exit();  // Hentikan eksekusi skrip
-        }
-    } catch (PDOException $e) {
-        // Tangani error koneksi database
-        error_log("Database connection error: " . $e->getMessage());
-        die("Koneksi gagal. Silakan coba lagi nanti.");
+    // Set session jika login berhasil
+    session_start();
+    $_SESSION['is_login'] = true;
+    $_SESSION['user_id'] = $row['id'];
+    $_SESSION['role_id'] = $row['role_id'];
+
+    // Arahkan pengguna sesuai dengan role mereka
+    if ($row['role_id'] == 1) {
+        // Redirect ke halaman admin (pages/dashboardAdmin.php) tanpa 'action/'
+        header('Location: ../index.php');
+    } elseif ($row['role_id'] == 2) {
+        // Redirect ke halaman mahasiswa (pages/dashboard.php) tanpa 'action/'
+        header('Location: ../index.php');
+    } else {
+        // Jika role tidak dikenali, logout dan arahkan ke halaman login
+        header('Location: ../login.php');
     }
+    exit();
 } else {
-    // Jika 'act' tidak ada dalam URL, redirect ke login
+    // Jika username dan password tidak cocok, kirimkan pesan error
+    session_start();
+    $_SESSION['status'] = false;
+    $_SESSION['message'] = 'Username atau password salah!';
     header('Location: ../login.php');
     exit();
 }
-?>

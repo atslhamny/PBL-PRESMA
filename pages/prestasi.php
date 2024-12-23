@@ -1,102 +1,130 @@
 <?php
-require_once __DIR__ . '/../lib/Connection.php'; // Pastikan koneksi database sudah benar
+require_once __DIR__ . '/../lib/Connection.php';
 
-// Query untuk mengambil data yang sesuai
+// Define the search term (this could come from a form or query parameter)
+$searchTerm = '%'; // Default to match everything if no search term is provided
+if (isset($_GET['search'])) {
+    $searchTerm = '%' . $_GET['search'] . '%'; // Use the search term from the query string
+}
+
+// Query for fetching data
 $query = "
-    SELECT 
-        mk.id,
-        mk.id_mahasiswa,
-        mk.peran_mahasiswa,
-        m.nama AS nama_mahasiswa,
-        k.judul_kompetisi,
-        YEAR(k.tanggal_akhir) AS tahun,
-        tk.tingkat_kompetisi AS tingkat
-    FROM 
-        mhs_kompetisi mk
-    LEFT JOIN mahasiswa m ON mk.id_mahasiswa = m.id
-    LEFT JOIN kompetisi k ON mk.id_kompetisi = k.id
-    LEFT JOIN tingkat_kompetisi tk ON k.id_tingkat_kompetisi = tk.id
-    ORDER BY tahun DESC, m.nama ASC
-"; // Pastikan tabel dan kolom sesuai dengan struktur database Anda
+SELECT 
+    k.id, 
+    m.nama, 
+    k.judul_kompetisi, 
+    t.tingkat_kompetisi,
+    k.tempat_kompetisi,
+    k.gelar,
+    YEAR(k.tanggal_mulai) AS tahun
+FROM kompetisi k
+JOIN mahasiswa m ON k.id_mahasiswa = m.id
+JOIN tingkat_kompetisi t ON k.id_tingkat_kompetisi = t.id
+WHERE 
+    k.judul_kompetisi LIKE ? OR 
+    m.nama LIKE ? OR 
+    t.tingkat_kompetisi LIKE ?
+ORDER BY k.tanggal_mulai DESC
+";
 
-$result = sqlsrv_query($db, $query); // Menggunakan variabel $db dari Connection.php
+// Prepare the statement
+$stmt = sqlsrv_prepare($db, $query, array($searchTerm, $searchTerm, $searchTerm));
 
-if (!$result) {
+// Execute the statement
+if ($stmt === false || !sqlsrv_execute($stmt)) {
     die(print_r(sqlsrv_errors(), true));
 }
 ?>
 
-<section class="content-header">
-    <div class="card">
-        <div class="col-sm-12" style="padding: 10px;">
-            <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
-                <li class="breadcrumb-item">
-                    <span class="fas fa-home" style="margin-right: 5px;"></span>
-                    <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
-                </li>
-                <li class="breadcrumb-item active">Prestasi Mahasiswa</li>
-            </ol>
-        </div>
-    </div>
-</section>
+<!DOCTYPE html>
+<html lang="en">
 
-<!-- Main content -->
-<section class="content">
-    <div class="card">
-        <div class="card-header">
-            <h4><b>Daftar Prestasi</b></h4>
-            <p>Berikut adalah daftar prestasi mahasiswa yang telah terdaftar:</p>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestasi Mahasiswa</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
 
-        <!-- Tabel -->
-        <div class="card-body">
-            <table class="table table-sm table-bordered table-striped" id="table-data">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Mahasiswa</th>
-                        <th>Judul Kompetisi</th>
-                        <th>Tahun</th>
-                        <th>Tingkat</th>
-                        <th>Peran Mahasiswa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $no = 1;
-                    while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
-                        echo "<tr>";
-                        echo "<td>" . $no++ . "</td>";
-                        echo "<td>" . htmlspecialchars($row['nama_mahasiswa'] ?? '-') . "</td>";
-                        echo "<td>" . htmlspecialchars($row['judul_kompetisi'] ?? '-') . "</td>";
-                        echo "<td>" . htmlspecialchars($row['tahun'] ?? '-') . "</td>";
-                        echo "<td>" . htmlspecialchars($row['tingkat'] ?? '-') . "</td>";
-                        echo "<td>" . htmlspecialchars($row['peran_mahasiswa'] ?? '-') . "</td>";
-                        echo "</tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+<body>
+    <section class="content-header">
+        <div class="card">
+            <div class="col-sm-12" style="padding: 10px;">
+                <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
+                    <li class="breadcrumb-item">
+                        <span class="fas fa-home" style="margin-right: 5px;"></span>
+                        <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
+                    </li>
+                    <li class="breadcrumb-item active">Prestasi Mahasiswa</li>
+                </ol>
+            </div>
         </div>
-        <!-- Tabel End -->
-    </div>
-</section>
+    </section>
 
-<script>
-    $(document).ready(function() {
-        $('#table-data').DataTable({
-            paging: true,
-            searching: true,
-            lengthChange: true,
-            pageLength: 10,
-            language: {
-                paginate: {
-                    previous: "Previous",
-                    next: "Next"
-                },
-                lengthMenu: "Show _MENU_ entries",
-                search: "Search:"
-            }
+    <section class="content">
+        <div class="card">
+            <div class="card-header" style="background-color: white;">
+                <h4><b>Daftar Prestasi</b></h4>
+                <p>Mahasiswa Politeknik Negeri Malang disiapkan untuk dapat bekerja maupun menjadi wirausaha yang sukses. Untuk itu, aktif dalam berbagai kegiatan lomba merupakan salah satu cara untuk mengasah kemampuan dan bakat para mahasiswa. Berikut beberapa prestasi yang telah diraih para mahasiswa dalam dekade terakhir:</p>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-bordered table-striped" id="table-data">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">No</th>
+                            <th>Nama Mahasiswa</th>
+                            <th>Judul Kompetisi</th>
+                            <th>Tahun</th>
+                            <th>Peringkat</th>
+                            <th>Tingkat Kompetisi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                            echo "<tr>
+                            <td style='text-align: center;'>{$no}</td>
+                            <td>{$row['nama']}</td>
+                            <td>{$row['judul_kompetisi']}</td>
+                            <td>{$row['tahun']}</td>
+                            <td>{$row['gelar']}</td>
+                            <td>{$row['tingkat_kompetisi']}</td>
+                          </tr>";
+                            $no++;
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#table-data').DataTable({
+                responsive: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                pageLength: 10,
+                language: {
+                    paginate: {
+                        previous: "Previous",
+                        next: "Next"
+                    },
+                    lengthMenu: "Show _MENU_ entries",
+                    search: "Search:"
+                }
+            });
         });
-    });
-</script>
+    </script>
+</body>
+
+</html>

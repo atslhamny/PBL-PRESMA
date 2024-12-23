@@ -1,62 +1,58 @@
-<!-- connection -->
-
 <?php
-// sql
-$use_driver = 'sqlsrv'; // mysql atau sqlsrv
-$host = 'TOKOPEDIA';
-$username = ''; //'sa';
-$password = '';
-$database = 'presma_fix';
-$db;
+class DatabaseConnection
+{
+    private $host;
+    private $database;
+    private $connection;
 
-
-if ($use_driver == 'mysql') {
-    try {
-        $db = new mysqli('localhost', $username, $password, $database);
-        if ($db->connect_error) {
-            die('Connection DB failed: ' . $db->connect_error);
-        }
-    } catch (Exception $e) {
-        die($e->getMessage());
+    public function __construct($host, $database)
+    {
+        $this->host = $host;
+        $this->database = $database;
+        $this->connect();
     }
-} else if ($use_driver == 'sqlsrv') {
-    $credential = [
-        'Database' => $database,
-        'UID' => $username,
-        'PWD' => $password
-    ];
-    try {
-        $db = sqlsrv_connect($host, $credential);
-        if (!$db) {
-            $msg = sqlsrv_errors();
-            die($msg[0]['message']);
+
+    private function connect()
+    {
+        $connectionInfo = [
+            'Database' => $this->database,
+            'CharacterSet' => 'UTF-8',
+            'TrustServerCertificate' => true // Tambahkan ini untuk koneksi lokal
+        ];
+
+        try {
+            $this->connection = sqlsrv_connect($this->host, $connectionInfo);
+
+            if ($this->connection === false) {
+                $errors = sqlsrv_errors();
+                throw new Exception("Koneksi database gagal: " . ($errors ? $errors[0]['message'] : "Unknown error"));
+            }
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            die("Kesalahan koneksi: " . $e->getMessage());
         }
-    } catch (Exception $e) {
-        die($e->getMessage());
+    }
+
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    public function closeConnection()
+    {
+        if ($this->connection) {
+            sqlsrv_close($this->connection);
+        }
     }
 }
 
-function getKategori()
-{
-    global $db, $use_driver;
-    $query = "SELECT * FROM m_kategori ORDER BY kategori_nama ASC";
-    $kategori = [];
+// Konfigurasi Koneksi
+$host = 'BASMAGEZI'; // Nama server Anda
+$database = 'presma_fix'; // Nama database Anda
 
-    if ($use_driver == 'mysql') {
-        $result = $db->query($query);
-        while ($row = $result->fetch_assoc()) {
-            $kategori[] = $row;
-        }
-    } else if ($use_driver == 'sqlsrv') {
-        $stmt = sqlsrv_query($db, $query);
-        if ($stmt === false) {
-            $errors = sqlsrv_errors();
-            die("SQL Server Query Error: " . $errors[0]['message']);
-        }
-        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-            $kategori[] = $row;
-        }
-    }
-
-    return $kategori;
+try {
+    $dbConnection = new DatabaseConnection($host, $database);
+    $db = $dbConnection->getConnection();
+} catch (Exception $e) {
+    die("Koneksi database gagal: " . $e->getMessage());
 }

@@ -1,292 +1,135 @@
-
 <?php
 require_once __DIR__ . '/../lib/Connection.php';
 
-// Mendapatkan data kategori (jika diperlukan, bisa disesuaikan dengan konteks).
-$kategori = getKategori();
+// Query untuk mengambil data prestasi
+$query = "
+SELECT 
+    k.id, 
+    m.nama, 
+    k.judul_kompetisi, 
+    t.tingkat_kompetisi,
+    YEAR(k.tanggal_mulai) AS tahun
+FROM kompetisi k
+JOIN mhs_kompetisi mk ON k.id = mk.id_kompetisi
+JOIN mahasiswa m ON mk.id_mahasiswa = m.id
+JOIN tingkat_kompetisi t ON k.id_tingkat_kompetisi = t.id
+ORDER BY k.tanggal_mulai DESC
+";
+
+$stmt = sqlsrv_query($db, $query);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 ?>
 
-<section class="content-header">
-    <div class="card">
-        <div class="col-sm-12" style="padding: 10px;">
-            <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
-                <li class="breadcrumb-item">
-                    <span class="fas fa-home" style="margin-right: 5px;"></span>
-                    <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
-                </li>
-                <li class="breadcrumb-item active">Prestasi Mahasiswa</li>
-            </ol>
-        </div>
-    </div>
-</section>
+<!DOCTYPE html>
+<html lang="en">
 
-<!-- Main content -->
-<section class="content">
-    <div class="card">
-        <div class="card-header">
-            <h4><b>Daftar Prestasi</b></h4>
-            <!-- <br> -->
-            <p>Mahasiswa Politeknik Negeri Malang disiapkan untuk dapat bekerja maupun menjadi wirausaha yang sukses. Untuk itu, aktif dalam berbagai kegiatan lomba merupakan salah satu cara untuk mengasah kemampuan dan bakat para mahasiswa. Berikut beberapa prestasi yang telah diraih para mahasiswa dalam dekade terakhir</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestasi Mahasiswa</title>
 
-            <p>
-                Mahasiswa Politeknik Negeri Malang disiapkan untuk dapat bekerja maupun menjadi wirausaha yang sukses.
-                Untuk itu, aktif dalam berbagai kegiatan lomba merupakan salah satu cara untuk mengasah kemampuan
-                dan bakat para mahasiswa. Berikut beberapa prestasi yang telah diraih para mahasiswa dalam dekade terakhir.
-            </p>
-        </div>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables Responsive CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <!-- Bootstrap (Opsional, jika dibutuhkan) -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
 
-        <!-- tabel -->
-        <div class="card-body">
-            <table class="table table-sm table-bordered table-striped" id="table-data">
-                <thead>
-                    <tr>
-                        <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">No</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Nama</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Judul Kompetisi</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Tahun</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Peringkat</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Tingkat</th>
-                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Aksi</th>
-
-                        <th>No</th>
-                        <th>Nama Mahasiswa</th>
-                        <th>Judul Kompetisi</th>
-                        <th>Tahun</th>
-                        <th>Peringkat</th>
-                        <th>Tingkat</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">1</td>
-                    <td>Atsila</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="even">
-                    <td class="dtr-control sorting_1" tabindex="0">2</td>
-                    <td>Rheina</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Afgan</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Bimantara</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="odd">
-                    <td class="dtr-control sorting_1" tabindex="0">3</td>
-                    <td>Puput</td>
-                    <td>Bussiness Plan</td>
-                    <td>2024</td>
-                    <td>Juara 1</td>
-                    <td>Nasional</td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(1)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-
-        <!-- tutup tabel -->
-
-    </div>
-</section>
-
-<script>
-    $(document).ready(function() {
-        $('#table-data').DataTable({
-            paging: true,
-            searching: true,
-            lengthChange: true,
-            pageLength: 10,
-            language: {
-                paginate: {
-                    previous: "Previous",
-                    next: "Next"
-                },
-                lengthMenu: "Show _MENU_ entries",
-                search: "Search:"
-            }
-        });
-    });
-    </div>
-</section>
-
-<!-- Modal Form -->
-<div class="modal fade" id="form-data" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <form id="form-tambah" method="post">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Form Prestasi Mahasiswa</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Nama Mahasiswa</label>
-                        <input type="text" name="nama" id="nama" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Judul Kompetisi</label>
-                        <input type="text" name="judul_kompetisi" id="judul_kompetisi" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Tahun</label>
-                        <input type="number" name="tahun" id="tahun" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Peringkat</label>
-                        <input type="text" name="peringkat" id="peringkat" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Tingkat</label>
-                        <input type="text" name="tingkat" id="tingkat" class="form-control" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                </div>
+<body>
+    <section class="content-header">
+        <div class="card">
+            <div class="col-sm-12" style="padding: 10px;">
+                <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
+                    <li class="breadcrumb-item">
+                        <span class="fas fa-home" style="margin-right: 5px;"></span>
+                        <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
+                    </li>
+                    <li class="breadcrumb-item active">Prestasi Mahasiswa</li>
+                </ol>
             </div>
-        </form>
-    </div>
-</div>
+        </div>
+    </section>
 
-<script>
-    var tabelData;
+    <!-- Main Content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header" style="background-color: white;">
+                <h4><b>Daftar Prestasi</b></h4>
+                <p>Mahasiswa Politeknik Negeri Malang disiapkan untuk dapat bekerja maupun menjadi wirausaha yang sukses. Untuk itu, aktif dalam berbagai kegiatan lomba merupakan salah satu cara untuk mengasah kemampuan dan bakat para mahasiswa. Berikut beberapa prestasi yang telah diraih para mahasiswa dalam dekade terakhir:</p>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-bordered table-striped" id="table-data">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">No</th>
+                            <th>Nama Mahasiswa</th>
+                            <th>Judul Kompetisi</th>
+                            <th>Tahun</th>
+                            <th>Peringkat</th>
+                            <th>Tingkat Kompetisi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                            echo "<tr>
+                            <td style='text-align: center;'>{$no}</td>
+                            <td>{$row['nama']}</td>
+                            <td>{$row['judul_kompetisi']}</td>
+                            <td>{$row['tahun']}</td>
+                            <td>Juara 1</td>
+                            <td>{$row['tingkat_kompetisi']}</td>
+                            <td style='text-align: center;'>
+                                <button type='button' class='btn btn-danger btn-sm' onclick='deleteRow({$row['id']})'>
+                                    <i class='fa fa-trash'></i>
+                                </button>
+                            </td>
 
-    $(document).ready(function() {
-        tabelData = $('#table-data').DataTable({
-            ajax: 'action/prestasiAdminAction.php?act=load',
-            columns: [{
-                    data: 'no'
-                },
-                {
-                    data: 'nama'
-                },
-                {
-                    data: 'judul_kompetisi'
-                },
-                {
-                    data: 'tahun'
-                },
-                {
-                    data: 'peringkat'
-                },
-                {
-                    data: 'tingkat'
-                },
-                {
-                    data: null,
-                    render: function(data, type, row) {
-                        return `
-                            <button class="btn btn-sm btn-warning" onclick="editData(${data.id})">Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteData(${data.id})">Hapus</button>
-                        `;
-                    }
-                }
-            ]
-        });
-
-        $('#form-tambah').validate({
-            submitHandler: function(form) {
-                $.ajax({
-                    url: $(form).attr('action'),
-                    method: 'post',
-                    data: $(form).serialize(),
-                    success: function(response) {
-                        const result = JSON.parse(response);
-                        if (result.status) {
-                            $('#form-data').modal('hide');
-                            tabelData.ajax.reload();
-                        } else {
-                            alert(result.message);
+                          </tr>";
+                            $no++;
                         }
-                    }
-                });
-            }
-        });
-    });
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 
-    function tambahData() {
-        $('#form-data').modal('show');
-        $('#form-tambah').attr('action', 'action/prestasiAdminAction.php?act=save');
-        $('#nama, #judul_kompetisi, #tahun, #peringkat, #tingkat').val('');
-    }
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Bootstrap JS (Opsional, jika digunakan) -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- DataTables Responsive JS -->
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
-    function editData(id) {
-        $.ajax({
-            url: 'action/prestasiAdminAction.php?act=get&id=' + id,
-            method: 'post',
-            success: function(response) {
-                const data = JSON.parse(response);
-                $('#form-data').modal('show');
-                $('#form-tambah').attr('action', 'action/prestasiAdminAction.php?act=update&id=' + id);
-                $('#nama').val(data.nama);
-                $('#judul_kompetisi').val(data.judul_kompetisi);
-                $('#tahun').val(data.tahun);
-                $('#peringkat').val(data.peringkat);
-                $('#tingkat').val(data.tingkat);
-            }
-        });
-    }
-
-    function deleteData(id) {
-        if (confirm('Apakah anda yakin ingin menghapus data ini?')) {
-            $.ajax({
-                url: 'action/prestasiAdminAction.php?act=delete&id=' + id,
-                method: 'post',
-                success: function(response) {
-                    const result = JSON.parse(response);
-                    if (result.status) {
-                        tabelData.ajax.reload();
-                    } else {
-                        alert(result.message);
-                    }
+    <!-- DataTables Initialization -->
+    <script>
+        $(document).ready(function() {
+            $('#table-data').DataTable({
+                responsive: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                pageLength: 10,
+                language: {
+                    paginate: {
+                        previous: "Previous",
+                        next: "Next"
+                    },
+                    lengthMenu: "Show _MENU_ entries",
+                    search: "Search:"
                 }
             });
-        }
-    }
-</script>
+        });
+    </script>
+</body>
+
+</html>

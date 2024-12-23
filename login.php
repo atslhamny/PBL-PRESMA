@@ -1,13 +1,18 @@
 <?php
-include('lib/Session.php'); // Memasukkan file Session.php untuk sesi pengguna
+include('lib/Session.php');
 
-$session = new Session(); // Membuat objek sesi
+$session = new Session();
 
-// Jika pengguna sudah login, arahkan ke halaman index.php
-if ($session->get('is_login') === true) {
+// Jika pengguna sudah login, arahkan ke halaman utama
+if ($session->get('is_login')) {
   header('Location: index.php');
-  exit(); // Menghentikan eksekusi lebih lanjut setelah redirect
+  exit();
 }
+
+// Atur Cache-Control agar halaman ini tidak disimpan di browser
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 ?>
 
 <!DOCTYPE html>
@@ -18,18 +23,9 @@ if ($session->get('is_login') === true) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PresMa - Login</title>
 
-  <!-- Google Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-
-  <!-- Font Awesome -->
+  <!-- CSS dipertahankan -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-  <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/icheck-bootstrap/3.0.1/icheck-bootstrap.min.css">
-
-  <!-- AdminLTE -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
   <style>
     body {
       background: url('img/background.png') no-repeat center center fixed;
@@ -44,29 +40,6 @@ if ($session->get('is_login') === true) {
     .card {
       border-radius: 20px;
     }
-
-    .card-header {
-      text-align: center;
-      padding: 20px;
-    }
-
-    .login-box-msg {
-      margin-bottom: 20px;
-    }
-
-    .alert {
-      font-size: 14px;
-    }
-
-    .btn-primary {
-      background-color: #007bff;
-      border-color: #007bff;
-    }
-
-    .btn-primary:hover {
-      background-color: #0056b3;
-      border-color: #004085;
-    }
   </style>
 </head>
 
@@ -78,21 +51,17 @@ if ($session->get('is_login') === true) {
       </div>
 
       <div class="card-body">
-        <p class="login-box-msg">Silahkan Login Terlebih Dahulu</p>
+        <p class="login-box-msg">Sign in to start your session</p>
 
-        <!-- Menampilkan pesan flash jika login gagal -->
-        <?php
-        $status = $session->getFlash('status');
-        if ($status === false) {
-          $message = $session->getFlash('message');
-          echo '<div class="alert alert-warning">' . $message .
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    </div>';
-        }
-        ?>
+        <!-- Pesan Flash -->
+        <?php if ($session->getFlash('status') === false): ?>
+          <div class="alert alert-warning">
+            <?= $session->getFlash('message') ?>
+          </div>
+        <?php endif; ?>
 
-        <!-- Form login username dan password-->
-        <form action="action/auth.php?act=login" method="post" id="form-login">
+        <!-- Form Login -->
+        <form action="action/auth.php" method="post" id="form-login">
           <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Username" name="username" required>
             <div class="input-group-append">
@@ -101,23 +70,21 @@ if ($session->get('is_login') === true) {
               </div>
             </div>
           </div>
+
           <div class="input-group mb-3">
             <input type="password" class="form-control" placeholder="Password" name="password" id="password" required>
             <div class="input-group-append">
               <div class="input-group-text">
-                <span id="toggle-password" class="fas fa-eye"></span>
+                <span class="fas fa-lock"></span>
               </div>
             </div>
           </div>
 
-          <!-- Checkbox untuk mengingat pengguna -->
           <div class="row">
             <div class="col-8">
               <div class="icheck-primary">
-                <input type="checkbox" id="remember">
-                <label for="remember">
-                  Remember Me
-                </label>
+                <input type="checkbox" id="show-password">
+                <label for="show-password">Show Password</label>
               </div>
             </div>
 
@@ -130,54 +97,20 @@ if ($session->get('is_login') === true) {
     </div>
   </div>
 
-  <!-- jQuery -->
+  <!-- JavaScript -->
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <!-- Bootstrap 4 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
-  <!-- AdminLTE -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
-  <!-- Form validation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.5/jquery.validate.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      $('#form-login').validate({
-        rules: {
-          username: {
-            required: true,
-            minlength: 3,
-            maxlength: 20
-          },
-          password: {
-            required: true,
-            minlength: 5,
-            maxlength: 255
-          }
-        },
-        errorElement: 'span',
-        errorPlacement: function(error, element) {
-          error.addClass('invalid-feedback');
-          element.closest('.input-group').append(error);
-        },
-        highlight: function(element, errorClass, validClass) {
-          $(element).addClass('is-invalid');
-        },
-        unhighlight: function(element, errorClass, validClass) {
-          $(element).removeClass('is-invalid');
-        }
-      });
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-      // Show/Hide password functionality
-      $('#toggle-password').on('click', function() {
-        const passwordField = $('#password');
-        const passwordFieldType = passwordField.attr('type');
-        if (passwordFieldType === 'password') {
-          passwordField.attr('type', 'text'); // Ubah menjadi teks untuk menampilkan password
-          $(this).removeClass('fa-eye').addClass('fa-eye-slash'); // Ubah ikon menjadi mata tertutup
-        } else {
-          passwordField.attr('type', 'password'); // Ubah kembali menjadi password
-          $(this).removeClass('fa-eye-slash').addClass('fa-eye'); // Ubah ikon menjadi mata terbuka
-        }
-      });
+  <!-- JavaScript untuk menampilkan/sembunyikan password -->
+  <script>
+    document.getElementById('show-password').addEventListener('change', function() {
+      var passwordInput = document.getElementById('password');
+      if (this.checked) {
+        passwordInput.type = 'text'; // Tampilkan password
+      } else {
+        passwordInput.type = 'password'; // Sembunyikan password
+      }
     });
   </script>
 </body>

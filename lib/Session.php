@@ -1,82 +1,41 @@
 <?php
-// Cek jika kelas Session sudah ada, jika belum maka deklarasikan
-if (!class_exists('Session')) {
-    class Session
+class Session
+{
+    public function __construct()
     {
-        // Konstruktor untuk memulai session jika belum dimulai
-        public function __construct()
-        {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
         }
+    }
 
-        // Menyimpan data dalam session
-        public function set($key, $value)
-        {
-            $_SESSION[$key] = $value;
-        }
+    public function set($key, $value)
+    {
+        $_SESSION[$key] = $value;
+    }
 
-        // Mengambil data dari session
-        public function get($key)
-        {
-            return (isset($_SESSION[$key])) ? $_SESSION[$key] : null;
-        }
+    public function get($key)
+    {
+        return $_SESSION[$key] ?? null;
+    }
 
-        // Mengecek apakah data session ada
-        public function exist($key)
-        {
-            return (isset($_SESSION[$key])) ? true : false;
-        }
+    public function setFlash($key, $value)
+    {
+        $_SESSION['flash'][$key] = $value;
+    }
 
-        // Menghapus data dari session
-        public function delete($key)
-        {
-            if (isset($_SESSION[$key])) {
-                unset($_SESSION[$key]);
-            }
+    public function getFlash($key)
+    {
+        if (isset($_SESSION['flash'][$key])) {
+            $flash = $_SESSION['flash'][$key];
+            unset($_SESSION['flash'][$key]);
+            return $flash;
         }
+        return null;
+    }
 
-        // Mengatur flash message dalam session
-        public function setFlash($key, $value)
-        {
-            $_SESSION['flash'][$key] = $value;
-        }
-
-        // Mengambil flash message dari session
-        public function getFlash($key)
-        {
-            $value = (isset($_SESSION['flash'][$key])) ? $_SESSION['flash'][$key] : null;
-            $this->deleteFlash($key); // Menghapus flash setelah diambil
-            return $value;
-        }
-
-        // Menghapus satu flash message
-        public function deleteFlash($key)
-        {
-            if (isset($_SESSION['flash'][$key])) {
-                unset($_SESSION['flash'][$key]);
-            }
-        }
-
-        // Menghapus semua flash messages
-        public function deleteAllFlash()
-        {
-            if (isset($_SESSION['flash'])) {
-                unset($_SESSION['flash']);
-            }
-        }
-
-        // Menghancurkan session
-        public function deleteAll()
-        {
-            session_destroy();
-        }
-
-        // Menyelesaikan session
-        public function commit()
-        {
-            session_commit();
-        }
+    public function destroy()
+    {
+        session_unset();
+        session_destroy();
     }
 }
