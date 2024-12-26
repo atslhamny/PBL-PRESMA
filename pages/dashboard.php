@@ -120,7 +120,7 @@
             </div>
         </div>
         <div class="card-body">
-            <h4><b style="color: #03618D;">Selamat Datang Rheina Putri,</b> Anda login sebagai Mahasiswa</h4>
+            <!-- <h4><b style="color: #03618D;">Selamat Datang Rheina Putri,</b> Anda login sebagai Mahasiswa</h4> -->
         </div>
 
         <div class="row" style="justify-content: center; padding: 15px;">

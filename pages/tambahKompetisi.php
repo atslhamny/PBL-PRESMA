@@ -1,3 +1,147 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();  // Hanya panggil session_start jika sesi belum dimulai
+}
+require_once __DIR__ . '/../lib/Connection.php';
+
+// Memeriksa apakah pengguna sudah login dengan memeriksa session 'user_id'
+if (!isset($_SESSION['user_id'])) {
+    die('Anda harus login untuk melihat data kompetisi.');
+}
+// Mendapatkan user_id dari sesi
+$userId = $_SESSION['user_id'];
+$peran_map = [
+    1 => 'Ketua',
+    2 => 'Anggota',
+    3 => 'Personal',
+];
+
+
+
+$peran_dosen_map = [
+    1 => 'Melakukan pembinaan kegiatan mahasiswa di bidang akademik (PA) dan kemahasiswaan (BEM, Maperwa, dan lain-lain)',
+    2 => 'Membimbing mahasiswa menghasilkan produk saintifik bereputasi dan mendapat pengakuan tingkat Internasional',
+    3 => 'Membimbing mahasiswa menghasilkan produk saintifik bereputasi dan mendapat pengakuan tingkat Nasional',
+    4 => 'Membimbing mahasiswa menghasilkan produk saintifik bereputasi dan mendapat pengakuan tingkat Regional'
+];
+if (isset($_REQUEST['simpan'])) {
+    $id_jenis_kompetisi = $_REQUEST['id_jenis_kompetisi'];
+    $id_tingkat_kompetisi = $_REQUEST['id_tingkat_kompetisi'];
+    $id_prodi = $_REQUEST['id_prodi'];
+    $judul_kompetisi = $_REQUEST['judul_kompetisi'];
+    $judul_kompetisi_en = $_REQUEST['judul_kompetisi_en'];
+    $tempat_kompetisi = $_REQUEST['tempat_kompetisi'];
+    $tempat_kompetisi_en = $_REQUEST['tempat_kompetisi_en'];
+    $url_kompetisi = $_REQUEST['url_kompetisi'];
+    $tanggal_mulai = $_REQUEST['tanggal_mulai'];
+    $tanggal_akhir = $_REQUEST['tanggal_akhir'];
+    $jumlah_pt = $_REQUEST['jumlah_pt'];
+    $jumlah_peserta = $_REQUEST['jumlah_peserta'];
+    $no_surat_tugas = $_REQUEST['no_surat_tugas'];
+    $tanggal_surat_tugas = $_REQUEST['tanggal_surat_tugas'];
+    $id_mahasiswa = $_REQUEST['id_mahasiswa'];
+    $peran_mahasiswa = $_REQUEST['peran_mahasiswa'];
+    $id_dosen = $_REQUEST['id_dosen'];
+    $peran_dosen = $_REQUEST['peran_dosen'];
+    $catatan = $_REQUEST['catatan'];
+    $status = "";
+    $validasi = 0;
+
+
+
+    // Check if the selected value exists in the map and convert to integer
+    if (isset($peran_map[$peran_mahasiswa])) {
+        $peran_mahasiswa_int = $peran_map[$peran_mahasiswa];
+    } else {
+        $peran_mahasiswa_int = null; // Handle the case where the value is not found
+    }
+
+
+
+    // Convert the selected role to an integer
+    if (isset($peran_dosen_map[$peran_dosen])) {
+        $peran_dosen_int = $peran_dosen_map[$peran_dosen];
+    } else {
+        $peran_dosen_int = null; // Handle the case where the value is not found
+    }
+
+    ///////////////////////////////////////////////////////////////
+    // Fungsi untuk mengunggah file
+    function uploadFile($inputName, $prefix)
+    {
+        if (isset($_FILES[$inputName]) && $_FILES[$inputName]['error'] == UPLOAD_ERR_OK) {
+            $targetDir = "upload/";
+            $randomString = bin2hex(random_bytes(8)); // Membuat nama random
+            $fileExtension = pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION);
+            $fileName = $prefix . "_" . $randomString . "." . $fileExtension;
+            $targetFile = $targetDir . $fileName;
+
+            if (move_uploaded_file($_FILES[$inputName]['tmp_name'], $targetFile)) {
+                return $fileName; // Mengembalikan nama file yang telah disimpan
+            } else {
+                die("Error saat mengunggah file: " . $_FILES[$inputName]['name']);
+            }
+        }
+        return null; // Jika tidak ada file yang diunggah
+    }
+
+    // Mengunggah file
+    $file_surat_tugas = uploadFile('file_surat_tugas', 'file_surat_tugas');
+    $foto_kegiatan = uploadFile('foto_kegiatan', 'foto_kegiatan');
+    $file_poster = uploadFile('file_poster', 'file_poster');
+    $file_sertifikat = uploadFile('file_sertifikat', 'file_sertifikat');
+
+    // Query untuk menyimpan data ke tabel kompetisi
+    $query = "INSERT INTO kompetisi (
+    id_prodi, id_jenis_kompetisi, id_tingkat_kompetisi, judul_kompetisi, 
+    judul_kompetisi_en, tempat_kompetisi, tempat_kompetisi_en, url_kompetisi, 
+    tanggal_mulai, tanggal_akhir, jumlah_pt, jumlah_peserta, no_surat_tugas, 
+    tanggal_surat_tugas, file_surat_tugas, foto_kegiatan, file_poster, 
+    id_mahasiswa, peran_mahasiswa, file_sertifikat, id_dosen, 
+    peran_dosen, catatan, status, validasi
+) VALUES (
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+)";
+
+
+
+    // Menyiapkan dan mengeksekusi query
+    $params = [
+        $id_prodi,
+        $id_jenis_kompetisi,
+        $id_tingkat_kompetisi,
+        $judul_kompetisi,
+        $judul_kompetisi_en,
+        $tempat_kompetisi,
+        $tempat_kompetisi_en,
+        $url_kompetisi,
+        $tanggal_mulai,
+        $tanggal_akhir,
+        $jumlah_pt,
+        $jumlah_peserta,
+        $no_surat_tugas,
+        $tanggal_surat_tugas,
+        $file_surat_tugas,
+        $foto_kegiatan,
+        $file_poster,
+        $id_mahasiswa,
+        $peran_mahasiswa_int, // Insert the integer value for peran_mahasiswa
+        $file_sertifikat,
+        $id_dosen,
+        $peran_dosen_int,
+        $validasi,
+        $catatan,
+        $status
+    ];
+
+    $stmt = sqlsrv_prepare($db, $query, $params);
+    if ($stmt === false || !sqlsrv_execute($stmt)) {
+        die("Error in inserting data: " . print_r(sqlsrv_errors(), true));
+    }
+    echo "Data berhasil disimpan!";
+    ///////////////////////////////////////////////////////////////
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,573 +177,339 @@
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title">Data Kompetisi</h3>
                     </div>
-                    <!-- /.card-header -->
-                    <!-- form start -->
-                    <form class="form-horizontal">
-                        <div class="card-body">
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Program Studi</label>
-                                <div class="col-sm-5">
-                                    <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected">Pilih Program Studi</option>
-                                        <option>Teknik Informatika</option>
-                                        <option>Sistem Informasi Bisnis</option>
-                                    </select>
-                                </div>
-                            </div>
 
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Jenis Kompetisi</label>
-                                <div class="col-sm-5">
-                                    <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected">Pilih Kompetisi</option>
-                                        <option>Hackton</option>
-                                        <option>Programer</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Tingkat Kompetisi</label>
-                                <div class="col-sm-5">
-                                    <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected">Pilih Tingkat Kompetisi</option>
-                                        <option>Nasional</option>
-                                        <option>Internasional</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Judul Kompetisi</label>
-                                <div class="col-sm-7">
-                                    <input class="form-control" type="text" placeholder="Judul Kompetisi">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Judul Kompetisi (English)
-                                </label>
-                                <div class="col-sm-7">
-                                    <input class="form-control" type="text" placeholder="Competition English">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Tempat Kompetisi</label>
-                                <div class="col-sm-7">
-                                    <input class="form-control" type="text" placeholder="Judul Kompetisi">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Tempat Kompetisi (English)
-                                </label>
-                                <div class="col-sm-7">
-                                    <input class="form-control" type="text" placeholder="Competition Veneu">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">URL Kompetisi</label>
-                                <div class="col-sm-7">
-                                    <input class="form-control" type="text">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Tanggal Mulai</label>
-                                <div class="col-sm-3">
-                                    <input class="form-control" type="date">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Tanggal Selesai</label>
-                                <div class="col-sm-3">
-                                    <input class="form-control" type="date">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Jumlah PT (Berpartisipasi)
-                                </label>
-                                <div class="col-sm-3">
-                                    <input class="form-control" type="text">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Jumlah Peserta</label>
-                                <div class="col-sm-3">
-                                    <input class="form-control" type="text">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Data Pembimbing</label>
-                                <div class="col-sm-4">
-                                    <input class="form-control" type="text">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">No Surat Tugas</label>
-                                <div class="col-sm-4">
-                                    <input class="form-control" type="text">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-3 col-form-label">Tanggal Surat Tugas</label>
-                                <div class="col-sm-3">
-                                    <input class="form-control" type="date">
-                                </div>
-                            </div>
-
-                            <!DOCTYPE html>
-                            <html lang="en">
-
-                            <head>
-                                <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>Form Upload</title>
-                                <!-- Bootstrap CSS -->
-                                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-                                    rel="stylesheet">
-                                <style>
-                                    .container {
-                                        margin-top: 50px;
-                                    }
-
-                                    .form-label {
-                                        font-weight: bold;
-                                    }
-
-                                    .form-group {
-                                        display: flex;
-                                        align-items: center;
-                                        margin-bottom: 30px;
-                                    }
-
-                                    .form-group label {
-                                        flex: 0 0 200px;
-                                    }
-
-                                    .form-control {
-                                        max-width: 400px;
-                                    }
-
-                                    .custom-upload-label {
-                                        background-color: #007bff;
-                                        color: white;
-                                        padding: 8px 12px;
-                                        border-radius: 5px;
-                                        cursor: pointer;
-                                        font-size: 14px;
-                                        font-weight: bold;
-                                    }
-
-                                    .info-text {
-                                        font-size: 12px;
-                                        color: gray;
-                                        margin-top: 5px;
-                                    }
-
-                                    .placeholder-image {
-                                        width: 250px;
-                                        height: 150px;
-                                        background-color: #f0f0f0;
-                                        display: inline-block;
-                                        border: 1px solid #ddd;
-                                        margin-left: 20px;
-                                        text-align: center;
-                                        line-height: 150px;
-                                        color: #aaa;
-                                        font-size: 14px;
-                                    }
-                                </style>
-                            </head>
-
-                            <body>
-                                <div class="container">
-                                    <!-- File Surat Tugas -->
-                                    <div class="form-group d-flex align-items-center justify-content-between">
-                                        <label for="fileSuratTugas" class="form-label">File Surat Tugas</label>
-                                        <div class="upload-container">
-                                            <div class="d-flex">
-                                                <label for="fileSuratTugas" class="custom-upload-label">Pilih
-                                                    File</label>
-                                                <input type="file" id="fileSuratTugas" class="form-control d-inline"
-                                                    style="display: none;">
-                                            </div>
-                                            <div class="info-text mt-2">
-                                                <small>Ukuran (Max: 5000Kb)</small>
-                                                <small class="ms-5">Ekstensi (.jpg, .jpeg, .png, .pdf, .docx)</small>
-                                            </div>
-                                        </div>
-                                        <div class="placeholder-image">
-                                            <div class="image-container">
-                                                IMAGE NOT AVAILABLE
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <!-- File Sertifikat -->
-                                    <div class="form-group d-flex align-items-center justify-content-between">
-                                        <label for="fileSertifikat" class="form-label">File Sertifikat</label>
-                                        <div class="upload-container">
-                                            <div class="d-flex ">
-                                                <label for="fileSertifikat" class="custom-upload-label">Pilih
-                                                    File</label>
-                                                <input type="file" id="fileSertifikat" class="form-control d-inline"
-                                                    style="display: none;">
-                                            </div>
-                                            <div class="info-text mt-2">
-                                                <small>Ukuran (Max: 5000Kb)</small>
-                                                <small class="ms-5">Ekstensi (.jpg, .jpeg, .png, .pdf, .docx)</small>
-                                            </div>
-                                        </div>
-                                        <div class="placeholder-image">
-                                            <div class="image-container">
-                                                IMAGE NOT AVAILABLE
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <!-- Foto Kegiatan -->
-                                    <div class="form-group d-flex align-items-center justify-content-between">
-                                        <label for="fileSertifikat" class="form-label">Foto Kegiatan</label>
-                                        <div class="upload-container">
-                                            <div class="d-flex ">
-                                                <label for="fileSertifikat" class="custom-upload-label">Pilih
-                                                    File</label>
-                                                <input type="file" id="fileSertifikat" class="form-control d-inline"
-                                                    style="display: none;">
-                                            </div>
-                                            <div class="info-text mt-2">
-                                                <small>Ukuran (Max: 5000Kb)</small>
-                                                <small class="ms-5">Ekstensi (.jpg, .jpeg, .png, .pdf, .docx)</small>
-                                            </div>
-                                        </div>
-                                        <div class="placeholder-image">
-                                            <div class="image-container">
-                                                IMAGE NOT AVAILABLE
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <!-- Bootstrap Bundle with Popper -->
-                                <script
-                                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-                                </script>
-
-                                <!DOCTYPE html>
-                                <html lang="en">
-
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                    <title>Form Data Mahasiswa dan Pembimbing</title>
-                                    <!-- AdminLTE CSS -->
-                                    <link rel="stylesheet"
-                                        href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-                                    <!-- Bootstrap CSS -->
-                                    <link rel="stylesheet"
-                                        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-                                    <!-- Font Awesome -->
-                                    <link rel="stylesheet"
-                                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-                                </head>
-
-                                <body class="hold-transition sidebar-mini">
-
-                                    <div class="container mt-5">
-                                        <div class="card card-primary">
-                                            <div class="card-header bg-primary text-white">
-                                                <h5 class="card-title">Data Mahasiswa</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <table class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No</th>
-                                                            <th>Mahasiswa</th>
-                                                            <th>Peran</th>
-                                                            <th>Hapus</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="mahasiswa-body">
-                                                        <tr>
-                                                            <td>1</td>
-                                                            <td>
-                                                                <select class="form-control" name="mahasiswa[]">
-                                                                    <option>Pilih NIM Mahasiswa</option>
-                                                                    <option>123456 - John Doe</option>
-                                                                    <option>123457 - Jane Smith</option>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <select class="form-control" name="peran[]">
-                                                                    <option>Pilih Peran</option>
-                                                                    <option>Ketua</option>
-                                                                    <option>Anggota</option>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <select class="form-control" name="peran[]">
-                                                                    <option>Pilih Peran</option>
-                                                                    <option>Ketua</option>
-                                                                    <option>Anggota</option>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <button type="button" class="btn btn-danger btn-sm"
-                                                                    onclick="deleteRow(this)">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <button type="button" class="btn btn-success mt-3"
-                                                    onclick="addMahasiswa()">
-                                                    <i class="fa fa-plus"></i> Tambah Mahasiswa
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="card card-warning mt-4">
-                                            <div class="card-header bg-warning text-white">
-                                                <h5 class="card-title">Data Pembimbing</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <table class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No</th>
-                                                            <th>Pembimbing</th>
-                                                            <th>Peran Pembimbing</th>
-                                                            <th>Hapus</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="pembimbing-body">
-                                                        <tr>
-                                                            <td>1</td>
-                                                            <td>
-                                                                <select class="form-control" name="pembimbing[]">
-                                                                    <option>Pilih Dosen</option>
-                                                                    <option>Dr. A</option>
-                                                                    <option>Dr. B</option>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <select class="form-control" name="peran_pembimbing[]">
-                                                                    <option>Pilih Peran</option>
-                                                                    <option>Pembimbing Utama</option>
-                                                                    <option>Pembimbing Pendamping</option>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <button type="button" class="btn btn-danger btn-sm"
-                                                                    onclick="deleteRow(this)">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <button type="button" class="btn btn-success mt-3"
-                                                    onclick="addPembimbing()">
-                                                    <i class="fa fa-plus"></i> Tambah Pembimbing
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-4">
-                                            <button class="btn btn-primary"><i class="fa fa-save"></i> Simpan</button>
-                                            <button class="btn btn-secondary"><i class="fa fa-arrow-left"></i>
-                                                Kembali</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Scripts -->
-                                    <script>
-                                        function deleteRow(button) {
-                                            const row = button.parentNode.parentNode;
-                                            row.parentNode.removeChild(row);
+                    <form action="index.php?page=tambah" method="post" enctype='multipart/form-data'>
+                        <form class="form-horizontal">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="prodi" class="col-sm-3 col-form-label">Program Studi</label>
+                                    <div class="col-sm-3">
+                                        <!--  -->
+                                        <?php
+                                        $query = "SELECT * from prodi";
+                                        // Menyiapkan dan mengeksekusi query untuk mengambil data kompetisi
+                                        $stmt = sqlsrv_prepare($db, $query);
+                                        if ($stmt === false || !sqlsrv_execute($stmt)) {
+                                            die(print_r(sqlsrv_errors(), true));
                                         }
-
-                                        function addMahasiswa() {
-                                            const tbody = document.getElementById('mahasiswa-body');
-                                            const rowCount = tbody.rows.length + 1;
-                                            const row = `
-            <tr>
-                <td>${rowCount}</td>
-                <td>
-                    <select class="form-control" name="mahasiswa[]">
-                        <option>Pilih NIM Mahasiswa</option>
-                        <option>123456 - John Doe</option>
-                        <option>123457 - Jane Smith</option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-control" name="peran[]">
-                        <option>Pilih Peran</option>
-                        <option>Ketua</option>
-                        <option>Anggota</option>
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </td>
-            </tr>`;
-                                            tbody.insertAdjacentHTML('beforeend', row);
+                                        echo "<select name=id_prodi class='form-control'><option></option>";
+                                        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                                            echo "<option value='$row[id]'>$row[nama_prodi]</option>";
                                         }
+                                        echo "</select>";
+                                        ?>
 
-                                        function addPembimbing() {
-                                            const tbody = document.getElementById('pembimbing-body');
-                                            const rowCount = tbody.rows.length + 1;
-                                            const row = `
-            <tr>
-                <td>${rowCount}</td>
-                <td>
-                    <select class="form-control" name="pembimbing[]">
-                        <option>Pilih Dosen</option>
-                        <option>Dr. A</option>
-                        <option>Dr. B</option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-control" name="peran_pembimbing[]">
-                        <option>Pilih Peran</option>
-                        <option>Pembimbing Utama</option>
-                        <option>Pembimbing Pendamping</option>
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </td>
-            </tr>`;
-                                            tbody.insertAdjacentHTML('beforeend', row);
+
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="jenis_kompetisi" class="col-sm-3 col-form-label">Jenis Kompetisi</label>
+                                    <div class="col-sm-3">
+                                        <!--  -->
+                                        <?php
+                                        $query = "SELECT * from jenis_kompetisi";
+                                        // Menyiapkan dan mengeksekusi query untuk mengambil data kompetisi
+                                        $stmt = sqlsrv_prepare($db, $query);
+                                        if ($stmt === false || !sqlsrv_execute($stmt)) {
+                                            die(print_r(sqlsrv_errors(), true));
                                         }
-                                    </script>
-                                </body>
+                                        echo "<select name=id_jenis_kompetisi class='form-control'><option></option>";
+                                        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                                            echo "<option value='$row[id]'>$row[jenis_kompetisi]</option>";
+                                        }
+                                        echo "</select>";
+                                        ?>
+                                    </div>
+                                </div>
 
-                                </html>
+                                <div class="form-group row">
+                                    <label for="tingkat_kompetisi" class="col-sm-3 col-form-label">Tingkat Kompetisi</label>
+                                    <div class="col-sm-3">
+                                        <!--  -->
+                                        <?php
+                                        $query = "SELECT * from tingkat_kompetisi";
+                                        // Menyiapkan dan mengeksekusi query untuk mengambil data kompetisi
+                                        $stmt = sqlsrv_prepare($db, $query);
+                                        if ($stmt === false || !sqlsrv_execute($stmt)) {
+                                            die(print_r(sqlsrv_errors(), true));
+                                        }
+                                        echo "<select name=id_tingkat_kompetisi class='form-control'><option></option>";
+                                        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                                            echo "<option value='$row[id]'>$row[tingkat_kompetisi]</option>";
+                                        }
+                                        echo "</select>";
+                                        ?>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="judul_kompetisi" class="col-sm-3 col-form-label">Judul Kompetisi</label>
+                                    <div class="col-sm-7">
+                                        <input class="form-control" name=judul_kompetisi type="text" placeholder="Judul Kompetisi">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="judul_kompetisi_en" class="col-sm-3 col-form-label">Judul Kompetisi (English)</label>
+                                    <div class="col-sm-7">
+                                        <input class="form-control" name='judul_kompetisi_en' type="text" placeholder="Competition English">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="tempat_kompetisi" class="col-sm-3 col-form-label">Tempat Kompetisi</label>
+                                    <div class="col-sm-7">
+                                        <input class="form-control" name='tempat_kompetisi' type="text" placeholder="Tempat Kompetisi">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="tempat_kompetisi_en" class="col-sm-3 col-form-label">Tempat Kompetisi (English)
+                                    </label>
+                                    <div class="col-sm-7">
+                                        <input class="form-control" name=tempat_kompetisi_en type="text" placeholder="Competition Veneu">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="url_kompetisi" class="col-sm-3 col-form-label">URL Kompetisi</label>
+                                    <div class="col-sm-7">
+                                        <input class="form-control" name=url_kompetisi type="text">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="tanggal_mulai" class="col-sm-3 col-form-label">Tanggal Mulai</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" name='tanggal_mulai' type="date">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="tanggal_akhir" class="col-sm-3 col-form-label">Tanggal Akhir</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" name='tanggal_akhir' type="date">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="jumlah_pt" class="col-sm-3 col-form-label">Jumlah PT (Berpartisipasi)
+                                    </label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" name='jumlah_pt' type="text">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="jumlah_peserta" class="col-sm-3 col-form-label">Jumlah Peserta</label>
+                                    <div class="col-sm-3">
+                                        <input name=jumlah_peserta class="form-control" type="text">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="no_surat_tugas" class="col-sm-3 col-form-label">No Surat Tugas</label>
+                                    <div class="col-sm-4">
+                                        <input name='no_surat_tugas' class="form-control" type="text">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="tanggal_surat_tugas" class="col-sm-3 col-form-label">Tanggal Surat Tugas</label>
+                                    <div class="col-sm-3">
+                                        <input name='tanggal_surat_tugas' class="form-control" type="date">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="file_surat_tugas">File Surat Tugas (Maksimal 1MB)</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input name="file_surat_tugas" type="file" class="custom-file-input" id="file_surat_tugas" accept=".pdf,.docx,.doc" onchange="validateFileSize(this)">
+                                            <label class="custom-file-label" for="file_surat_tugas">Choose file</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="foto_kegiatan">Foto Kegiatan (Maksimal 1MB)</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input name="foto_kegiatan" type="file" class="custom-file-input" id="foto_kegiatan" accept=".jpeg,.png,.jpg" onchange="validateFileSize(this)">
+                                            <label class="custom-file-label" for="foto_kegiatan">Choose file</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="file_poster">File Poster (Maksimal 1MB)</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input name="file_poster" type="file" class="custom-file-input" id="file_poster" accept=".jpeg,.png,.jpg,.pdf" onchange="validateFileSize(this)">
+                                            <label class="custom-file-label" for="file_poster">Choose file</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Data Mahasiswa</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Input untuk Nama Mahasiswa -->
+                                        <div class="form-group">
+                                            <label for="id_mahasiswa">Nama Mahasiswa</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                </div>
+                                                <?php
+                                                $query = "SELECT * from mahasiswa";
+                                                // Menyiapkan dan mengeksekusi query untuk mengambil data mahasiswa
+                                                $stmt = sqlsrv_prepare($db, $query);
+                                                if ($stmt === false || !sqlsrv_execute($stmt)) {
+                                                    die(print_r(sqlsrv_errors(), true));
+                                                }
+                                                echo "<select name='id_mahasiswa' class='form-control'><option></option>";
+                                                while ($row = sqlsrv_fetch_array($stmt)) {
+                                                    echo "<option value='$row[id]'>$row[nama]</option>";
+                                                }
+                                                echo "</select>";
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <!-- /.form-group -->
+
+                                        <!-- Input untuk Peran Mahasiswa -->
+                                        <div class="form-group">
+                                            <label for="peran_mahasiswa">Peran Mahasiswa</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-tasks"></i></span>
+                                                </div>
+                                                <select name="peran_mahasiswa" class="form-control">
+                                                    <option value="">Pilih Peran</option>
+                                                    <?php
+                                                    foreach ($peran_map as $k => $v) {
+                                                        echo "<option value='$k'>$v</option>";
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- /.form-group -->
+                                        <div class="form-group">
+                                            <label for="file_sertifikat">File Sertifikat</label>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input name='file_sertifikat' type="file" class="custom-file-input" id="file_sertifikat" accept=".jpeg,.png,.jpg,.pdf">
+                                                    <label class="custom-file-label" for="foto_kegiatan">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.card-body -->
+                                </div>
+
+                                <div class="card card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Data Pembimbing</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Input untuk Nama Pembimbing -->
+                                        <div class="form-group">
+                                            <label for="id_dosen">Nama Pembimbing</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-chalkboard-teacher"></i></span>
+                                                </div>
+                                                <?php
+                                                $query = "SELECT * from dosen";
+                                                // Menyiapkan dan mengeksekusi query untuk mengambil data dosen
+                                                $stmt = sqlsrv_prepare($db, $query);
+                                                if ($stmt === false || !sqlsrv_execute($stmt)) {
+                                                    die(print_r(sqlsrv_errors(), true));
+                                                }
+                                                echo "<select name='id_dosen' class='form-control'><option>Pilih Pembimbing</option>";
+                                                while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                                                    echo "<option value='{$row['id']}'>{$row['nama_dosen']}</option>";
+                                                }
+                                                echo "</select>";
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <!-- /.form-group -->
+
+                                        <!-- Input untuk Peran Pembimbing -->
+                                        <div class="form-group">
+                                            <label for="peran_dosen">Peran Pembimbing</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                                </div>
+                                                <select name="peran_dosen" class="form-control">
+                                                    <option value="">Pilih Peran</option>
+                                                    <?php
+                                                    foreach ($peran_dosen_map as $k => $v) {
+                                                        echo "<option value='$k'>$v</option>";
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- /.form-group -->
+                                    </div>
+                                    <!-- /.card-body -->
+
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Catatan</label>
+                                    <textarea class="form-control" id="catatan" name="" rows="3" placeholder="Enter ..." disabled=""></textarea>
+                                </div>
 
 
 
+                                <div class="form-group">
+                                    <label for="save"></label>
+                                    <div class="input-group">
 
+                                        <input type=submit value='simpan' name=simpan class='btn btn-primary'>
+                                    </div>
+                                </div>
+                        </form>
 
-                                <!-- /.card-body -->
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-
-
-
-    <script>
-        function editData(id) {
-            $.ajax({
-                url: 'action/kategoriAction.php?act=get&id=' + id,
-                method: 'post',
-                success: function(response) {
-                    var data = JSON.parse(response);
-                    $('#form-data').modal('show');
-                    $('#form-tambah').attr('action', 'action/kategoriAction.php?act=update&id=' + id);
-                    $('#kategori_kode').val(data.kategori_kode);
-                    $('#kategori_nama').val(data.kategori_nama);
-                }
-            });
-        }
-
-        function deleteData(id) {
-            if (confirm('Apakah anda yakin?')) {
-                $.ajax({
-                    url: 'action/kategoriAction.php?act=delete&id=' + id,
-                    method: 'post',
-                    success: function(response) {
-                        var result = JSON.parse(response);
-                        if (result.status) {
-                            tabelData.ajax.reload();
-                        } else {
-                            alert(result.message);
-                        }
-                    }
-                });
-            }
-        }
-
-        var tabelData;
-        $(document).ready(function() {
-            tabelData = $('#table-data').DataTable({
-                ajax: 'action/kategoriAction.php?act=load',
-            });
-
-            $('#form-tambah').validate({
-                rules: {
-                    kategori_kode: {
-                        required: true,
-                        minlength: 3
-                    },
-                    kategori_nama: {
-                        required: true,
-                        minlength: 5
-                    }
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                },
-                submitHandler: function(form) {
-                    $.ajax({
-                        url: $(form).attr('action'),
-                        method: 'post',
-                        data: $(form).serialize(),
-                        success: function(response) {
-                            var result = JSON.parse(response);
-                            if (result.status) {
-                                $('#form-data').modal('hide');
-                                tabelData.ajax.reload();
-                            } else {
-                                alert(result.message);
+                        <script>
+                            function validateFileSize(input) {
+                                const file = input.files[0];
+                                if (file) {
+                                    const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+                                    if (file.size > maxSize) {
+                                        alert("Ukuran file tidak boleh lebih dari 1MB.");
+                                        input.value = ""; // Reset input jika ukuran file terlalu besar
+                                    }
+                                }
                             }
-                        }
-                    });
-                }
-            });
-        });
-    </script>
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Optional JavaScript for custom-file-input -->
-    <script>
-        document.querySelectorAll('.custom-file-input').forEach(input => {
-            input.addEventListener('change', event => {
-                const fileName = event.target.files[0]?.name || "Choose file";
-                event.target.nextElementSibling.innerText = fileName;
-            });
-        });
-    </script>
+                        </script>
+
+
+
+                        </script>
+                        <!-- Bootstrap Bundle with Popper -->
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                        <!-- Optional JavaScript for custom-file-input -->
+                        <script>
+                            document.querySelectorAll('.custom-file-input').forEach(input => {
+                                input.addEventListener('change', event => {
+                                    const fileName = event.target.files[0]?.name || "Choose file";
+                                    event.target.nextElementSibling.innerText = fileName;
+                                });
+                            });
+                        </script>
 </body>
 
 </html>

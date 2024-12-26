@@ -47,7 +47,7 @@ class DatabaseConnection
 }
 
 // Konfigurasi Koneksi
-$host = 'BASMAGEZI'; // Nama server Anda
+$host = 'TOKOPEDIA'; // Nama server Anda
 $database = 'presma_fix'; // Nama database Anda
 
 try {

@@ -39,13 +39,14 @@ SELECT
     m.nama, 
     k.judul_kompetisi, 
     k.catatan,
-    k.gelar,
     k.status,
+	t.tingkat_kompetisi,
     YEAR(k.tanggal_mulai) AS tahun
 FROM kompetisi k
 JOIN mahasiswa m ON k.id_mahasiswa = m.id
 JOIN tingkat_kompetisi t ON k.id_tingkat_kompetisi = t.id
 WHERE k.id_mahasiswa = ?
+
 ORDER BY k.tanggal_mulai DESC
 ";
 
@@ -102,6 +103,7 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                             <th>Peringkat</th>
                             <th>Catatan</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,7 +115,7 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                             <td>{$row['nama']}</td>
                             <td>{$row['judul_kompetisi']}</td>
                             <td>{$row['tahun']}</td>
-                            <td>{$row['gelar']}</td>
+                            <td>{$row['tingkat_kompetisi']}</td>
                             <td>{$row['catatan']}</td>
                             <td>";
                             switch ($row['status']) {
@@ -130,7 +132,9 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                                     echo "<span class='text-muted'><i class='fas fa-question-circle'></i> Tidak Diketahui</span>";
                                     break;
                             }
-                            echo "</td></tr>";
+                            echo "</td>
+                            <td><a href='index.php?page=edit_kompetisi&id={$row['id']}'>Edit</a>&nbsp;<a href='index.php?page=hapus_kompetisi&id={$row['id']}'>Hapus</a></td>                            
+                            </tr>";
                             $no++;
                         }
                         ?>

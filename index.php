@@ -86,6 +86,12 @@ header('Pragma: no-cache');
           case 'tambah':
             include('pages/tambahKompetisi.php');
             break;
+          case 'edit_kompetisi':
+            include('pages/editKompetisi.php');
+            break;
+          case 'hapus_kompetisi':
+            include('pages/hapusKompetisi.php');
+            break;
           case 'detail':
             include('pages/detailKompetisi.php');
             break;

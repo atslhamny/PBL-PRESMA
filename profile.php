@@ -4,20 +4,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PresMa - Login</title>
+    <title>Profil Mahasiswa</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="adminlte/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/icheck-bootstrap/3.0.1/icheck-bootstrap.min.css">
 
     <!-- AdminLTE CSS -->
-    <link rel="stylesheet" href="adminlte/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 
     <!-- Optional: Tambahkan CSS lokal jika ada -->
     <!-- <link rel="stylesheet" href="css/style.css"> -->
@@ -120,9 +119,7 @@
                                 <div class="form-group">
                                     <label for="prodi">Prodi</label>
                                     <select class="form-control" id="prodi">
-                                        <option selected>Pilih Prodi</option>
-                                        <option>Sistem Informasi Bisnis</option>
-                                        <option>Teknik Informatika</option>
+                                        
                                     </select>
                                 </div>
                             </div>
@@ -147,7 +144,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="changePassword">Change Password</label>
+                        <label for="changePassword">Konfirmasi Password</label>
                         <div class="input-group mb-3">
                             <input type="password" class="form-control" placeholder="Password">
                             <div class="input-group-append">
@@ -156,21 +153,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="input-group mb-3">
-                            <input type="password" class="form-control" placeholder="Confirm Password">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-lock"></span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                        <label class="form-check-label" for="exampleCheck1">Remember Me</label>
-                    </div>
-
                     <br>
 
                     <div class="row">
