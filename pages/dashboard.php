@@ -1,3 +1,39 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();  // Hanya panggil session_start jika sesi belum dimulai
+}
+require_once __DIR__ . '/../lib/Connection.php';
+
+if (!isset($_SESSION['user_id'])) {
+    die('Anda harus login untuk melihat data kompetisi.');
+}
+// Mendapatkan user_id dari sesi
+$userId = $_SESSION['user_id'];
+
+$queryTingkatKompetisi = "
+SELECT 
+    t.tingkat_kompetisi, 
+    COUNT(k.id) AS total
+FROM kompetisi k
+JOIN tingkat_kompetisi t ON k.id_tingkat_kompetisi = t.id
+WHERE k.id_mahasiswa = ?
+GROUP BY t.tingkat_kompetisi
+";
+
+// Prepare and execute the statement
+$stmtTingkat = sqlsrv_prepare($db, $queryTingkatKompetisi, array($userId));
+if ($stmtTingkat === false || !sqlsrv_execute($stmtTingkat)) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Fetch the results into an associative array
+$tingkatData = [];
+while ($row = sqlsrv_fetch_array($stmtTingkat, SQLSRV_FETCH_ASSOC)) {
+    $tingkatData[$row['tingkat_kompetisi']] = $row['total'];
+}
+?>
+
+
 <!-- dashboard mahasiswa -->
 <style>
     /* General styling */
@@ -122,14 +158,13 @@
         <div class="card-body">
             <!-- <h4><b style="color: #03618D;">Selamat Datang Rheina Putri,</b> Anda login sebagai Mahasiswa</h4> -->
         </div>
-
         <div class="row" style="justify-content: center; padding: 15px;">
             <div class="col-lg-4 col-6">
-                <!-- small box -->
+                <!-- Tingkat Nasional -->
                 <div class="small-box bg-lightblue" style="border-radius: 20px;">
                     <div class="inner" style="padding: 14px;">
-                        <h3>150</h3>
-                        <p>Kompetisi Mahasiswa</p>
+                        <h3><?= $tingkatData['Nasional'] ?? 0; ?></h3>
+                        <p>Kompetisi Tingkat Nasional</p>
                     </div>
                     <div class="icon" style="padding: 5px;">
                         <i class="fas fa-trophy"></i>
@@ -141,37 +176,38 @@
             </div>
 
             <div class="col-lg-4 col-6">
-                <!-- small box -->
+                <!-- Tingkat Internasional -->
                 <div class="small-box bg-maroon" style="border-radius: 20px;">
                     <div class="inner" style="padding: 14px;">
-                        <h3>150</h3>
-                        <p>Mahasiswa Berprestasi</p>
+                        <h3><?= $tingkatData['Internasional'] ?? 0; ?></h3>
+                        <p>Kompetisi Tingkat Internasional</p>
                     </div>
                     <div class="icon" style="padding: 5px;">
-                        <i class="fas fa-graduation-cap"></i>
+                        <i class="fas fa-globe"></i>
                     </div>
-                    <a href="index.php?page=prestasi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                    <a href="index.php?page=kompetisi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
                         More info <i class="fas fa-arrow-circle-right"></i>
                     </a>
                 </div>
             </div>
 
             <div class="col-lg-4 col-6">
-                <!-- small box -->
+                <!-- Tingkat Regional -->
                 <div class="small-box bg-warning" style="border-radius: 20px;">
                     <div class="inner" style="padding: 14px;">
-                        <h3>150</h3>
-                        <p>Prestasi Mahasiswa</p>
+                        <h3><?= $tingkatData['Kab/Kota'] ?? 0; ?></h3>
+                        <p>Kompetisi Tingkat Regional</p>
                     </div>
                     <div class="icon" style="padding: 5px;">
-                        <i class="fas fa-medal"></i>
+                        <i class="fas fa-map"></i>
                     </div>
-                    <a href="index.php?page=prestasi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                    <a href="index.php?page=kompetisi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
                         More info <i class="fas fa-arrow-circle-right"></i>
                     </a>
                 </div>
             </div>
         </div>
+
     </div>
 </section>
 

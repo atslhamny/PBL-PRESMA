@@ -70,7 +70,7 @@ die(print_r(sqlsrv_errors(), true));
 </head>
 
 <body>
-    <section class="content-header">
+    <!-- <section class="content-header">
         <div class="card">
             <div class="col-sm-12" style="padding: 10px;">
                 <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
@@ -82,8 +82,9 @@ die(print_r(sqlsrv_errors(), true));
                 </ol>
             </div>
         </div>
-    </section>
-
+    </section> -->
+    <br>
+    
     <section class="content">
         <div class="card">
             <div class="card-header" style="background-color: white;">
