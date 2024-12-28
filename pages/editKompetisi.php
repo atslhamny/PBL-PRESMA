@@ -42,9 +42,8 @@ if (isset($_REQUEST['simpan'])) {
     $peran_mahasiswa = $_REQUEST['peran_mahasiswa'];
     $id_dosen = $_REQUEST['id_dosen'];
     $peran_dosen = $_REQUEST['peran_dosen'];
-    $catatan = "";
-    $status = "";
-    $validasi = 0;
+    $catatan = isset($_REQUEST['catatan']) && !empty(trim($_REQUEST['catatan'])) ? $_REQUEST['catatan'] : "Tidak ada catatan";
+    $status = isset($_REQUEST['status']) && !empty(trim($_REQUEST['status'])) ? $_REQUEST['status'] : "Pending";
 
 
 
@@ -114,7 +113,8 @@ if (isset($_REQUEST['simpan'])) {
     file_sertifikat = '$file_sertifikat', 
     id_dosen = '$id_dosen', 
     peran_dosen = '$peran_dosen', 
-    catatan = '$catatan' WHERE id='$_REQUEST[id]'";
+    catatan = '$catatan' 
+    WHERE id='$_REQUEST[id]'";
 
 
     $stmt = sqlsrv_prepare($db, $query);
@@ -170,7 +170,7 @@ if (isset($_REQUEST['simpan'])) {
                     while ($row0 = sqlsrv_fetch_array($stmt0, SQLSRV_FETCH_ASSOC)) {
                     ?>
 
-                        <form action="index.php?page=edit_kompetisi" method="post" enctype='multipart/form-data'>
+                        <form action="index.php?page=kompetisi" method="post" enctype='multipart/form-data'>
                             <form class="form-horizontal"><input type=hidden name='id' value='<?php echo $_REQUEST['id']; ?>'>
                                 <div class="card-body">
                                     <div class="form-group row">
@@ -340,7 +340,7 @@ if (isset($_REQUEST['simpan'])) {
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="file_surat_tugas">File Surat Tugas (Maksimal 1MB)</label>
+                                        <label for="file_surat_tugas">File Surat Tugas (Maksimal 1MB) <b>Mohon Isi Kembali Jika Update</b></label>
                                         <br>
                                         <?php echo $row0['file_surat_tugas']; ?>
                                         <div class="input-group">
@@ -352,19 +352,25 @@ if (isset($_REQUEST['simpan'])) {
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="foto_kegiatan">Foto Kegiatan (Maksimal 1MB)</label>
+                                        <label for="foto_kegiatan">Foto Kegiatan (Maksimal 1MB) <b>Mohon Isi Kembali Jika Update</b></label>
                                         <br>
-                                        <?php echo $row0['foto_kegiatan']; ?>
+                                        <?php if (!empty($row0['foto_kegiatan'])): ?>
+                                            <div id="existingPreview">
+                                                <p>Preview Gambar Saat Ini:</p>
+                                                <img src="upload/<?php echo htmlspecialchars($row0['foto_kegiatan']); ?>" alt="Foto Kegiatan" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px;">
+                                            </div>
+                                        <?php endif; ?>
                                         <div class="input-group">
                                             <div class="custom-file">
-                                                <input name="foto_kegiatan" type="file" class="custom-file-input" id="foto_kegiatan" accept=".jpeg,.png,.jpg" onchange="validateFileSize(this)">
+                                                <input name="foto_kegiatan" type="file" class="custom-file-input" id="foto_kegiatan" accept=".jpeg,.png,.jpg" onchange="previewImage(this); validateFileSize(this);">
                                                 <label class="custom-file-label" for="foto_kegiatan">Choose file</label>
                                             </div>
                                         </div>
+                                        <div id="imagePreviewFotoKegiatan" style="margin-top: 10px;"></div> <!-- Tempat untuk preview gambar baru -->
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="file_poster">File Poster (Maksimal 1MB)</label>
+                                        <label for="file_poster">File Poster (Maksimal 1MB) <b>Mohon Isi Kembali Jika Update</b></label>
                                         <br>
                                         <?php echo $row0['file_poster']; ?>
                                         <div class="input-group">
@@ -432,7 +438,7 @@ if (isset($_REQUEST['simpan'])) {
 
                                             <!-- /.form-group -->
                                             <div class="form-group">
-                                                <label for="file_sertifikat">File Sertifikat</label>
+                                                <label for="file_sertifikat">File Sertifikat <b>Mohon Isi Kembali Jika Update</b></label>
                                                 <br>
                                                 <?php echo $row0['file_sertifikat']; ?>
                                                 <div class="input-group">
@@ -532,6 +538,41 @@ if (isset($_REQUEST['simpan'])) {
                                         alert("Ukuran file tidak boleh lebih dari 1MB.");
                                         input.value = ""; // Reset input jika ukuran file terlalu besar
                                     }
+                                }
+                            }
+
+                            // Fungsi untuk menampilkan preview gambar baru
+                            function previewImage(input) {
+                                const file = input.files[0];
+                                const fileId = input.id;
+                                let previewContainer;
+
+                                // Select the correct preview container based on the input field's ID
+                                if (fileId === 'foto_kegiatan') {
+                                    previewContainer = document.getElementById('imagePreviewFotoKegiatan');
+                                } else if (fileId === 'file_sertifikat') {
+                                    previewContainer = document.getElementById('imagePreviewSertifikat');
+                                }
+
+                                previewContainer.innerHTML = ""; // Reset preview sebelumnya
+
+                                if (file && file.type.startsWith('image/')) {
+                                    const reader = new FileReader();
+
+                                    reader.onload = function(e) {
+                                        const img = document.createElement('img');
+                                        img.src = e.target.result; // Menggunakan data URL dari FileReader
+                                        img.style.maxWidth = "200px";
+                                        img.style.maxHeight = "200px";
+                                        img.style.border = "1px solid #ddd";
+                                        img.style.padding = "5px";
+
+                                        previewContainer.appendChild(img);
+                                    };
+
+                                    reader.readAsDataURL(file); // Membaca file dan memuat preview
+                                } else {
+                                    previewContainer.innerHTML = "<p>Preview tidak tersedia untuk file ini.</p>";
                                 }
                             }
                         </script>

@@ -1,4 +1,6 @@
 
+
+
 <style>
     /* General styling */
     .breadcrumb {
@@ -131,11 +133,6 @@
                     </button>
                 </div>
             </div>
-            <div class="card-body">
-                <h4><b style="color: #03618D;">Selamat Datang <?php echo htmlspecialchars($nama); ?>,</b> Anda login sebagai <?php echo htmlspecialchars($role); ?></h4>
-
-            </div>
-
             <div class="row" style="justify-content: center; padding:15px;">
                 <div class="col-lg-4 col-6">
                     <div class="small-box bg-lightblue" style="border-radius: 20px;">
@@ -175,63 +172,7 @@
                 </div>
             </div>
 
-            <!-- berita -->
-            <div class="berita">
-                <h3 class="berita-header">
-                    <b>Berita Terbaru</b>
-                    <a href="pages/tambahBerita.php" class="add-icon" style="color: #03618D;">
-                        <i class="fas fa-plus"></i>
-                    </a>
-                </h3>
-
-                <!-- box berita -->
-                <div class="row" style="justify-content: center; padding: 15px;">
-                    <div class="col-lg-4 col-md-6 col-12" style="padding: 10px;">
-                        <div class="card" style="position: relative;">
-                            <span style="position: absolute; top: 13px; right: 13px; cursor: pointer; color: #fff; padding: 5px; border-radius: 50%;" onclick="deleteCard(this)">
-                                <i class="fas fa-trash"></i>
-                            </span>
-
-                            <img src="img/berita.jpg" alt="Berita image" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="card-title">Mahasiswa Polinema</h6>
-                                <p class="card-text">Some quick example text to build on the card title.</p>
-                                <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 col-12" style="padding: 10px;">
-                        <div class="card" style="position: relative;">
-                            <span style="position: absolute; top: 13px; right: 13px; cursor: pointer; color: #fff; padding: 5px; border-radius: 50%;" onclick="deleteCard(this)">
-                                <i class="fas fa-trash"></i>
-                            </span>
-
-                            <img src="img/berita.jpg" alt="Berita image" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="card-title">Mahasiswa Polinema</h6>
-                                <p class="card-text">Some quick example text to build on the card title.</p>
-                                <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 col-12" style="padding: 10px;">
-                        <div class="card" style="position: relative;">
-                            <span style="position: absolute; top: 13px; right: 13px; cursor: pointer; color: #fff; padding: 5px; border-radius: 50%;" onclick="deleteCard(this)">
-                                <i class="fas fa-trash"></i>
-                            </span>
-
-                            <img src="img/berita.jpg" alt="Berita image" class="card-img-top">
-                            <div class="card-body">
-                                <h6 class="card-title">Mahasiswa Polinema</h6>
-                                <p class="card-text">Some quick example text to build on the card title.</p>
-                                <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
         </div>
     </section>

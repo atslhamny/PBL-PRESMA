@@ -172,48 +172,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Berita section -->
-        <div class="berita">
-            <h3 class="berita-header"><b>Berita Terbaru</b></h3>
-            <div style="display: flex; gap: 25px;">
-                <div class="card">
-                    <img src="img/berita.jpg" alt="Berita image">
-                    <div class="card-body">
-                        <h6 class="card-title">Mahasiswa Polinema</h6>
-                        <p class="card-text">Some quick example text to build on the card title.</p>
-                        <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <img src="img/berita.jpg" alt="Berita image">
-                    <div class="card-body">
-                        <h6 class="card-title">Mahasiswa Polinema</h6>
-                        <p class="card-text">Some quick example text to build on the card title.</p>
-                        <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <img src="img/berita.jpg" alt="Berita image">
-                    <div class="card-body">
-                        <h6 class="card-title">Mahasiswa Polinema</h6>
-                        <p class="card-text">Some quick example text to build on the card title.</p>
-                        <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <img src="img/berita.jpg" alt="Berita image">
-                    <div class="card-body">
-                        <h6 class="card-title">Mahasiswa Polinema</h6>
-                        <p class="card-text">Some quick example text to build on the card title.</p>
-                        <a href="https://mbkm.polinema.ac.id/" class="btn btn-primary">Baca selengkapnya..</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </section>
 

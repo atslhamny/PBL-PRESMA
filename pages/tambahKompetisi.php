@@ -16,8 +16,6 @@ $peran_map = [
     3 => 'Personal',
 ];
 
-
-
 $peran_dosen_map = [
     1 => 'Melakukan pembinaan kegiatan mahasiswa di bidang akademik (PA) dan kemahasiswaan (BEM, Maperwa, dan lain-lain)',
     2 => 'Membimbing mahasiswa menghasilkan produk saintifik bereputasi dan mendapat pengakuan tingkat Internasional',
@@ -43,9 +41,8 @@ if (isset($_REQUEST['simpan'])) {
     $peran_mahasiswa = $_REQUEST['peran_mahasiswa'];
     $id_dosen = $_REQUEST['id_dosen'];
     $peran_dosen = $_REQUEST['peran_dosen'];
-    $catatan = $_REQUEST['catatan'];
-    $status = "";
-    $validasi = 0;
+    $catatan = isset($_REQUEST['catatan']) && !empty(trim($_REQUEST['catatan'])) ? $_REQUEST['catatan'] : "Tidak ada catatan";
+    $status = isset($_REQUEST['status']) && !empty(trim($_REQUEST['status'])) ? $_REQUEST['status'] : "Pending";
 
 
 
@@ -129,9 +126,9 @@ if (isset($_REQUEST['simpan'])) {
         $file_sertifikat,
         $id_dosen,
         $peran_dosen_int,
-        $validasi,
         $catatan,
-        $status
+        $status,
+        0 // Set validasi to 0
     ];
 
     $stmt = sqlsrv_prepare($db, $query, $params);
@@ -161,7 +158,7 @@ if (isset($_REQUEST['simpan'])) {
                         <span class="fas fa-home" style="margin-right: 5px;"></span>
                         <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
                     </li>
-                    <li class="breadcrumb-item active">Dashboard</li>
+                    <li class="breadcrumb-item active">Form Kompetisi</li>
                 </ol>
             </div>
         </div>
@@ -178,7 +175,7 @@ if (isset($_REQUEST['simpan'])) {
                         <h3 class="card-title">Data Kompetisi</h3>
                     </div>
 
-                    <form action="index.php?page=tambah" method="post" enctype='multipart/form-data'>
+                    <form action="index.php?page=kompetisi" method="post" enctype='multipart/form-data'>
                         <form class="form-horizontal">
                             <div class="card-body">
                                 <div class="form-group row">
@@ -192,7 +189,7 @@ if (isset($_REQUEST['simpan'])) {
                                         if ($stmt === false || !sqlsrv_execute($stmt)) {
                                             die(print_r(sqlsrv_errors(), true));
                                         }
-                                        echo "<select name=id_prodi class='form-control' required><option></option>";
+                                        echo "<select name=id_prodi class='form-control' required><option>Pilih Prodi</option>";
                                         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                             echo "<option value='$row[id]'>$row[nama_prodi]</option>";
                                         }
@@ -212,7 +209,7 @@ if (isset($_REQUEST['simpan'])) {
                                         if ($stmt === false || !sqlsrv_execute($stmt)) {
                                             die(print_r(sqlsrv_errors(), true));
                                         }
-                                        echo "<select name=id_jenis_kompetisi class='form-control' required><option></option>";
+                                        echo "<select name=id_jenis_kompetisi class='form-control' required><option>Pilih Jenis Kompetisi</option>";
                                         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                             echo "<option value='$row[id]'>$row[jenis_kompetisi]</option>";
                                         }
@@ -232,7 +229,7 @@ if (isset($_REQUEST['simpan'])) {
                                         if ($stmt === false || !sqlsrv_execute($stmt)) {
                                             die(print_r(sqlsrv_errors(), true));
                                         }
-                                        echo "<select name=id_tingkat_kompetisi class='form-control' required><option></option>";
+                                        echo "<select name=id_tingkat_kompetisi class='form-control' required><option>Pilih Tingkat Kompetisi</option>";
                                         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                             echo "<option value='$row[id]'>$row[tingkat_kompetisi]</option>";
                                         }
@@ -333,10 +330,10 @@ if (isset($_REQUEST['simpan'])) {
                                 <div class="form-group">
                                     <label for="foto_kegiatan">Foto Kegiatan (Maksimal 1MB)</label>
                                     <br>
-                                    <?php if (!empty($row0['foto_kegiatan'])): ?>
+                                    <?php if (!empty($row['foto_kegiatan'])): ?>
                                         <div id="existingPreview">
                                             <p>Preview Gambar Saat Ini:</p>
-                                            <img src="upload/<?php echo htmlspecialchars($row0['foto_kegiatan']); ?>" alt="Foto Kegiatan" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px;">
+                                            <img src="upload/<?php echo htmlspecialchars($row['foto_kegiatan']); ?>" alt="Foto Kegiatan" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px;">
                                         </div>
                                     <?php endif; ?>
                                     <div class="input-group">
@@ -377,7 +374,7 @@ if (isset($_REQUEST['simpan'])) {
                                                 if ($stmt === false || !sqlsrv_execute($stmt)) {
                                                     die(print_r(sqlsrv_errors(), true));
                                                 }
-                                                echo "<select name='id_mahasiswa' class='form-control' required><option></option>";
+                                                echo "<select name='id_mahasiswa' class='form-control' required><option>Pilih Mahasiswa</option>";
                                                 while ($row = sqlsrv_fetch_array($stmt)) {
                                                     echo "<option value='$row[id]'>$row[nama]</option>";
                                                 }
@@ -432,7 +429,7 @@ if (isset($_REQUEST['simpan'])) {
                                                     <span class="input-group-text"><i class="fas fa-chalkboard-teacher"></i></span>
                                                 </div>
                                                 <?php
-                                                $query = "SELECT * from dosen";
+                                                $query = "SELECT * FROM dosen";
                                                 // Menyiapkan dan mengeksekusi query untuk mengambil data dosen
                                                 $stmt = sqlsrv_prepare($db, $query);
                                                 if ($stmt === false || !sqlsrv_execute($stmt)) {
@@ -474,7 +471,7 @@ if (isset($_REQUEST['simpan'])) {
 
                                 <div class="form-group">
                                     <label>Catatan</label>
-                                    <textarea class="form-control" id="catatan" name="" rows="3" placeholder="Enter ..." disabled=""></textarea>
+                                    <textarea class="form-control" id="catatan" name="catatan" value="Tidak ada" rows="3" placeholder="Enter ..." disabled=""></textarea>
                                 </div>
 
 
