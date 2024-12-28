@@ -32,10 +32,10 @@ if (sqlsrv_has_rows($stmt)) {
     // Arahkan pengguna sesuai dengan role mereka
     if ($row['role_id'] == 1) {
         // Redirect ke halaman admin (pages/dashboardAdmin.php) tanpa 'action/'
-        header('Location: ../index.php');
+        header('Location: ../index.php?page=dashboard_admin');
     } elseif ($row['role_id'] == 2) {
         // Redirect ke halaman mahasiswa (pages/dashboard.php) tanpa 'action/'
-        header('Location: ../index.php');
+        header('Location: ../index.php?page=dashboard');
     } else {
         // Jika role tidak dikenali, logout dan arahkan ke halaman login
         header('Location: ../login.php');

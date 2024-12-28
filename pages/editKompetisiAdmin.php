@@ -42,11 +42,8 @@ if (isset($_REQUEST['simpan'])) {
     $peran_mahasiswa = $_REQUEST['peran_mahasiswa'];
     $id_dosen = $_REQUEST['id_dosen'];
     $peran_dosen = $_REQUEST['peran_dosen'];
-    $catatan = "";
-    $status = "";
-    $validasi = 0;
-
-
+    $catatan = isset($_REQUEST['catatan']) && !empty(trim($_REQUEST['catatan'])) ? $_REQUEST['catatan'] : "Tidak ada catatan";
+    $status = isset($_REQUEST['status']) && !empty(trim($_REQUEST['status'])) ? $_REQUEST['status'] : "Pending";
 
     // Check if the selected value exists in the map and convert to integer
     if (isset($peran_map[$peran_mahasiswa])) {
@@ -523,8 +520,6 @@ if (isset($_REQUEST['simpan'])) {
                                         <label>Catatan</label>
                                         <textarea class="form-control" id="catatan" name="" rows="3" placeholder="Enter ..." disabled=""></textarea>
                                     </div>
-
-
 
                                     <div class="form-group">
                                         <label for="save"></label>

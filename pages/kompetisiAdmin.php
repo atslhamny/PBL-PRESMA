@@ -32,6 +32,25 @@ if ($userRole['role_id'] != 1) {
     die('Akses ditolak! Hanya admin yang dapat melihat data ini.');
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'])) {
+    $id = $_POST['id'];
+    $status = $_POST['status'];
+
+    // Validasi input status
+    if (!in_array($status, ['Diterima', 'Ditolak'], true)) {
+        die('Status tidak valid.');
+    }
+
+    // Query untuk memperbarui status
+    $queryUpdate = "UPDATE kompetisi SET status = ? WHERE id = ?";
+    $params = [$status, $id];
+
+    $stmtUpdate = sqlsrv_prepare($db, $queryUpdate, $params);
+    if ($stmtUpdate === false || !sqlsrv_execute($stmtUpdate)) {
+        die("Error in updating status: " . print_r(sqlsrv_errors(), true));
+    }
+}
+
 // Query untuk mengambil semua data kompetisi mahasiswa
 $query = "
 SELECT 
@@ -114,13 +133,13 @@ while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                             $no = 1;
                             foreach ($dataKompetisi as $row) {
                                 echo "<tr>
-                                    <td style='text-align: center;'>{$no}</td>
-                                    <td>{$row['nama']}</td>
-                                    <td>{$row['judul_kompetisi']}</td>
-                                    <td>{$row['tahun']}</td>
-                                    <td>{$row['tingkat_kompetisi']}</td>
-                                    <td>{$row['catatan']}</td>
-                                    <td>";
+                <td style='text-align: center;'>{$no}</td>
+                <td>{$row['nama']}</td>
+                <td>{$row['judul_kompetisi']}</td>
+                <td>{$row['tahun']}</td>
+                <td>{$row['tingkat_kompetisi']}</td>
+                <td>{$row['catatan']}</td>
+                <td>";
                                 switch ($row['status']) {
                                     case 'Pending':
                                         echo "<span class='text-warning'><i class='fas fa-hourglass-half'></i> Pending</span>";
@@ -136,10 +155,23 @@ while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                         break;
                                 }
                                 echo "</td>
-                                    <td>
-                                        <a href='index.php?page=edit_kompetisi_admin&id={$row['id']}'>Edit</a>&nbsp;
-                                    </td>
-                                </tr>";
+                <td>
+                <a href='index.php?page=edit_kompetisi_admin&id={$row['id']}' class='btn btn-info btn-sm'>
+        <i class='fas fa-info-circle'></i> Detail </a>
+                    <form method='POST' style='display: inline;'>
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                        <button type='submit' name='status' value='Diterima' class='btn btn-success btn-sm'>
+                            <i class='fas fa-check-circle'></i> Diterima
+                        </button>
+                    </form>
+                    <form method='POST' style='display: inline;'>
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                        <button type='submit' name='status' value='Ditolak' class='btn btn-danger btn-sm'>
+                            <i class='fas fa-times-circle'></i> Ditolak
+                        </button>
+                    </form>
+                </td>
+            </tr>";
                                 $no++;
                             }
                         } else {
@@ -147,6 +179,7 @@ while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                         }
                         ?>
                     </tbody>
+
                 </table>
             </div>
         </div>
