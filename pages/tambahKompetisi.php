@@ -192,15 +192,12 @@ if (isset($_REQUEST['simpan'])) {
                                         if ($stmt === false || !sqlsrv_execute($stmt)) {
                                             die(print_r(sqlsrv_errors(), true));
                                         }
-                                        echo "<select name=id_prodi class='form-control'><option></option>";
+                                        echo "<select name=id_prodi class='form-control' required><option></option>";
                                         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                             echo "<option value='$row[id]'>$row[nama_prodi]</option>";
                                         }
                                         echo "</select>";
                                         ?>
-
-
-
                                     </div>
                                 </div>
 
@@ -215,7 +212,7 @@ if (isset($_REQUEST['simpan'])) {
                                         if ($stmt === false || !sqlsrv_execute($stmt)) {
                                             die(print_r(sqlsrv_errors(), true));
                                         }
-                                        echo "<select name=id_jenis_kompetisi class='form-control'><option></option>";
+                                        echo "<select name=id_jenis_kompetisi class='form-control' required><option></option>";
                                         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                             echo "<option value='$row[id]'>$row[jenis_kompetisi]</option>";
                                         }
@@ -235,7 +232,7 @@ if (isset($_REQUEST['simpan'])) {
                                         if ($stmt === false || !sqlsrv_execute($stmt)) {
                                             die(print_r(sqlsrv_errors(), true));
                                         }
-                                        echo "<select name=id_tingkat_kompetisi class='form-control'><option></option>";
+                                        echo "<select name=id_tingkat_kompetisi class='form-control' required><option></option>";
                                         while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                             echo "<option value='$row[id]'>$row[tingkat_kompetisi]</option>";
                                         }
@@ -247,21 +244,21 @@ if (isset($_REQUEST['simpan'])) {
                                 <div class="form-group row">
                                     <label for="judul_kompetisi" class="col-sm-3 col-form-label">Judul Kompetisi</label>
                                     <div class="col-sm-7">
-                                        <input class="form-control" name=judul_kompetisi type="text" placeholder="Judul Kompetisi">
+                                        <input class="form-control" name=judul_kompetisi type="text" placeholder="Judul Kompetisi" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="judul_kompetisi_en" class="col-sm-3 col-form-label">Judul Kompetisi (English)</label>
                                     <div class="col-sm-7">
-                                        <input class="form-control" name='judul_kompetisi_en' type="text" placeholder="Competition English">
+                                        <input class="form-control" name='judul_kompetisi_en' type="text" placeholder="Competition English" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="tempat_kompetisi" class="col-sm-3 col-form-label">Tempat Kompetisi</label>
                                     <div class="col-sm-7">
-                                        <input class="form-control" name='tempat_kompetisi' type="text" placeholder="Tempat Kompetisi">
+                                        <input class="form-control" name='tempat_kompetisi' type="text" placeholder="Tempat Kompetisi" required>
                                     </div>
                                 </div>
 
@@ -269,28 +266,28 @@ if (isset($_REQUEST['simpan'])) {
                                     <label for="tempat_kompetisi_en" class="col-sm-3 col-form-label">Tempat Kompetisi (English)
                                     </label>
                                     <div class="col-sm-7">
-                                        <input class="form-control" name=tempat_kompetisi_en type="text" placeholder="Competition Veneu">
+                                        <input class="form-control" name=tempat_kompetisi_en type="text" placeholder="Competition Veneu" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="url_kompetisi" class="col-sm-3 col-form-label">URL Kompetisi</label>
                                     <div class="col-sm-7">
-                                        <input class="form-control" name=url_kompetisi type="text">
+                                        <input class="form-control" name=url_kompetisi type="text" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="tanggal_mulai" class="col-sm-3 col-form-label">Tanggal Mulai</label>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name='tanggal_mulai' type="date">
+                                        <input class="form-control" name='tanggal_mulai' type="date" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="tanggal_akhir" class="col-sm-3 col-form-label">Tanggal Akhir</label>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name='tanggal_akhir' type="date">
+                                        <input class="form-control" name='tanggal_akhir' type="date" required>
                                     </div>
                                 </div>
 
@@ -298,28 +295,28 @@ if (isset($_REQUEST['simpan'])) {
                                     <label for="jumlah_pt" class="col-sm-3 col-form-label">Jumlah PT (Berpartisipasi)
                                     </label>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name='jumlah_pt' type="text">
+                                        <input class="form-control" name='jumlah_pt' type="text" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="jumlah_peserta" class="col-sm-3 col-form-label">Jumlah Peserta</label>
                                     <div class="col-sm-3">
-                                        <input name=jumlah_peserta class="form-control" type="text">
+                                        <input name=jumlah_peserta class="form-control" type="text" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="no_surat_tugas" class="col-sm-3 col-form-label">No Surat Tugas</label>
                                     <div class="col-sm-4">
-                                        <input name='no_surat_tugas' class="form-control" type="text">
+                                        <input name='no_surat_tugas' class="form-control" type="text" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label for="tanggal_surat_tugas" class="col-sm-3 col-form-label">Tanggal Surat Tugas</label>
                                     <div class="col-sm-3">
-                                        <input name='tanggal_surat_tugas' class="form-control" type="date">
+                                        <input name='tanggal_surat_tugas' class="form-control" type="date" required>
                                     </div>
                                 </div>
 
@@ -327,7 +324,7 @@ if (isset($_REQUEST['simpan'])) {
                                     <label for="file_surat_tugas">File Surat Tugas (Maksimal 1MB)</label>
                                     <div class="input-group">
                                         <div class="custom-file">
-                                            <input name="file_surat_tugas" type="file" class="custom-file-input" id="file_surat_tugas" accept=".pdf,.docx,.doc" onchange="validateFileSize(this)">
+                                            <input name="file_surat_tugas" type="file" class="custom-file-input" id="file_surat_tugas" accept=".pdf,.docx,.doc" onchange="validateFileSize(this)" required>
                                             <label class="custom-file-label" for="file_surat_tugas">Choose file</label>
                                         </div>
                                     </div>
@@ -335,14 +332,22 @@ if (isset($_REQUEST['simpan'])) {
 
                                 <div class="form-group">
                                     <label for="foto_kegiatan">Foto Kegiatan (Maksimal 1MB)</label>
+                                    <br>
+                                    <?php if (!empty($row0['foto_kegiatan'])): ?>
+                                        <div id="existingPreview">
+                                            <p>Preview Gambar Saat Ini:</p>
+                                            <img src="upload/<?php echo htmlspecialchars($row0['foto_kegiatan']); ?>" alt="Foto Kegiatan" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px;">
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="input-group">
                                         <div class="custom-file">
-                                            <input name="foto_kegiatan" type="file" class="custom-file-input" id="foto_kegiatan" accept=".jpeg,.png,.jpg" onchange="validateFileSize(this)">
+                                            <input name="foto_kegiatan" type="file" class="custom-file-input" id="foto_kegiatan" accept=".jpeg,.png,.jpg" onchange="previewImage(this); validateFileSize(this);">
                                             <label class="custom-file-label" for="foto_kegiatan">Choose file</label>
                                         </div>
                                     </div>
+                                    <div id="imagePreviewFotoKegiatan" style="margin-top: 10px;"></div> <!-- Tempat untuk preview gambar baru -->
                                 </div>
-
+                                <!-- terakhir edit -->
                                 <div class="form-group">
                                     <label for="file_poster">File Poster (Maksimal 1MB)</label>
                                     <div class="input-group">
@@ -372,7 +377,7 @@ if (isset($_REQUEST['simpan'])) {
                                                 if ($stmt === false || !sqlsrv_execute($stmt)) {
                                                     die(print_r(sqlsrv_errors(), true));
                                                 }
-                                                echo "<select name='id_mahasiswa' class='form-control'><option></option>";
+                                                echo "<select name='id_mahasiswa' class='form-control' required><option></option>";
                                                 while ($row = sqlsrv_fetch_array($stmt)) {
                                                     echo "<option value='$row[id]'>$row[nama]</option>";
                                                 }
@@ -389,7 +394,7 @@ if (isset($_REQUEST['simpan'])) {
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><i class="fas fa-tasks"></i></span>
                                                 </div>
-                                                <select name="peran_mahasiswa" class="form-control">
+                                                <select name="peran_mahasiswa" class="form-control" required>
                                                     <option value="">Pilih Peran</option>
                                                     <?php
                                                     foreach ($peran_map as $k => $v) {
@@ -433,7 +438,7 @@ if (isset($_REQUEST['simpan'])) {
                                                 if ($stmt === false || !sqlsrv_execute($stmt)) {
                                                     die(print_r(sqlsrv_errors(), true));
                                                 }
-                                                echo "<select name='id_dosen' class='form-control'><option>Pilih Pembimbing</option>";
+                                                echo "<select name='id_dosen' class='form-control' required><option>Pilih Pembimbing</option>";
                                                 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                                                     echo "<option value='{$row['id']}'>{$row['nama_dosen']}</option>";
                                                 }
@@ -450,7 +455,7 @@ if (isset($_REQUEST['simpan'])) {
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                                 </div>
-                                                <select name="peran_dosen" class="form-control">
+                                                <select name="peran_dosen" class="form-control" required>
                                                     <option value="">Pilih Peran</option>
                                                     <?php
                                                     foreach ($peran_dosen_map as $k => $v) {
@@ -492,6 +497,41 @@ if (isset($_REQUEST['simpan'])) {
                                         alert("Ukuran file tidak boleh lebih dari 1MB.");
                                         input.value = ""; // Reset input jika ukuran file terlalu besar
                                     }
+                                }
+                            }
+
+                            // Fungsi untuk menampilkan preview gambar baru
+                            function previewImage(input) {
+                                const file = input.files[0];
+                                const fileId = input.id;
+                                let previewContainer;
+
+                                // Select the correct preview container based on the input field's ID
+                                if (fileId === 'foto_kegiatan') {
+                                    previewContainer = document.getElementById('imagePreviewFotoKegiatan');
+                                } else if (fileId === 'file_sertifikat') {
+                                    previewContainer = document.getElementById('imagePreviewSertifikat');
+                                }
+
+                                previewContainer.innerHTML = ""; // Reset preview sebelumnya
+
+                                if (file && file.type.startsWith('image/')) {
+                                    const reader = new FileReader();
+
+                                    reader.onload = function(e) {
+                                        const img = document.createElement('img');
+                                        img.src = e.target.result; // Menggunakan data URL dari FileReader
+                                        img.style.maxWidth = "200px";
+                                        img.style.maxHeight = "200px";
+                                        img.style.border = "1px solid #ddd";
+                                        img.style.padding = "5px";
+
+                                        previewContainer.appendChild(img);
+                                    };
+
+                                    reader.readAsDataURL(file); // Membaca file dan memuat preview
+                                } else {
+                                    previewContainer.innerHTML = "<p>Preview tidak tersedia untuk file ini.</p>";
                                 }
                             }
                         </script>

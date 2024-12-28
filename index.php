@@ -42,7 +42,7 @@ header('Pragma: no-cache');
     <!-- Sidebar -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #1E6892;">
       <a href="#" class="brand-link">
-        <img src="img/logo2.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8;">
+        <img src="img/logojti.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8;">
         <span class="brand-text font-weight-light"><b>Presma Polinema</b></span>
       </a>
       <?php include('layouts/sidebar.php'); ?>
@@ -57,24 +57,24 @@ header('Pragma: no-cache');
       // Ambil parameter halaman dari URL
       $page = strtolower($_GET['page'] ?? 'dashboard'); // Default 'dashboard'
 
-      // Role admin (role_id == 1)
+      // Role admin (role == 1)
       if ($role_id == 1) {
         switch ($page) {
-          case 'dashboard':
+          case 'dashboard_admin':
             include("pages/dashboardAdmin.php");
             break;
-          case 'kompetisi':
+          case 'kompetisi_admin':
             include("pages/kompetisiAdmin.php");
             break;
-          case 'prestasi':
+          case 'tambah_mahasiswa':
             include("pages/prestasiAdmin.php");
             break;
           default:
-            include("pages/404.php");
+            include("404.php");
             break;
         }
       }
-      // Role mahasiswa (role_id == 2)
+      // Role mahasiswa (role == 2)
       elseif ($role_id == 2) {
         switch ($page) {
           case 'dashboard':
@@ -99,13 +99,13 @@ header('Pragma: no-cache');
             include("pages/prestasi.php");
             break;
           default:
-            include("pages/404.php");
+            include("404.php");
             break;
         }
       }
       // Jika role_id tidak valid
       else {
-        include("pages/404.php");
+        include("404.php");
       }
       ?>
     </div>

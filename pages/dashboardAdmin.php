@@ -1,42 +1,3 @@
-<?php
-// Memulai sesi untuk mengakses data pengguna yang sudah login
-// session_start();
-
-// Mengimpor koneksi database
-require_once __DIR__ . '/../lib/Connection.php';
-
-// Simulasi sesi login untuk pengujian
-$_SESSION['username'] = 'admin1';
-$_SESSION['role'] = 'Admin';
-
-// Ambil data dari sesi
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
-
-// Cek apakah username dan role ada
-if (!empty($username) && !empty($role)) {
-    // Query untuk mendapatkan nama pengguna berdasarkan role
-    if ($role === 'Mahasiswa') {
-        $query = "SELECT nama_mahasiswa AS nama FROM mahasiswa WHERE username = ?";
-    } elseif ($role === 'Admin') {
-        $query = "SELECT nama_admin AS nama FROM admin WHERE username = ?";
-    } else {
-        $nama = "User Tidak Diketahui";
-    }
-
-    if (isset($query)) {
-        $stmt = sqlsrv_prepare($db, $query, [$username]);
-        if (sqlsrv_execute($stmt)) {
-            $result = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-            $nama = $result ? $result['nama'] : "User Tidak Ditemukan";
-        } else {
-            $nama = "Query Gagal Dijalankan";
-        }
-    }
-} else {
-    $nama = "User Tidak Login";
-}
-?>
 
 <style>
     /* General styling */
@@ -160,7 +121,7 @@ if (!empty($username) && !empty($role)) {
     <section class="content">
         <div class="card-dash">
             <div class="card-header">
-                <h3 class="card-title"><b>Dashboard</b></h3>
+                <h3 class="card-title"><b>Dashboard Admin</b></h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-minus"></i>
@@ -185,7 +146,7 @@ if (!empty($username) && !empty($role)) {
                         <div class="icon" style="padding: 5px;">
                             <i class="fas fa-trophy"></i>
                         </div>
-                        <a href="index.php?page=kompetisi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="index.php?page=kompetisi_admin" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-6">
@@ -209,7 +170,7 @@ if (!empty($username) && !empty($role)) {
                         <div class="icon" style="padding: 5px;">
                             <i class="fas fa-medal"></i>
                         </div>
-                        <a href="index.php?page=prestasi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="index.php?page=prestasi_admin" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
             </div>

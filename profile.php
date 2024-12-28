@@ -75,17 +75,14 @@
                 <div class="card-body">
                     <div class="card-body d-flex align-items-center">
                         <div class="profile-image">
-                            <img src="img/profil.png" id="profileImage" class="img-thumbnail" alt="Profile">
+                            <img src="img/profil.png" id="foto" name="foto" class="img-thumbnail" alt="Profile">
                         </div>
                         <div class="form-group ml-4" style="width: 100%;">
                             <label for="exampleInputFile">Ubah Foto Profil</label>
                             <div class="input-group">
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="exampleInputFile" accept="image/*" onchange="previewImage(event)">
-                                    <label class="custom-file-label" for="exampleInputFile">Pilih file</label>
-                                </div>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">Upload</span>
+                                    <input type="file" class="custom-file-input" id="foto" name="foto" accept=".jpg,.jpeg,.png" onchange="previewImage(event)">
+                                    <label class="custom-file-label" for="foto">Pilih file</label>
                                 </div>
                             </div>
                         </div>

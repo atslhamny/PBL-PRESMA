@@ -54,16 +54,19 @@ header('Pragma: no-cache');
         <p class="login-box-msg">Sign in to start your session</p>
 
         <!-- Pesan Flash -->
-        <?php if ($session->getFlash('status') === false): ?>
-          <div class="alert alert-warning">
-            <?= $session->getFlash('message') ?>
-          </div>
-        <?php endif; ?>
+        <?php
+        $status = $session->getFlash('status');
+        if ($status === false) {
+          $message = $session->getFlash('message');
+          echo '<div class="alert alert-warning">' . $message . '<button type="button" class="close" data-dismiss="alert" arialabel="Close"><span aria-hidden="true">&times;</span></div>';
+        }
+        ?>
 
         <!-- Form Login -->
         <form action="action/auth.php" method="post" id="form-login">
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Username" name="username" required>
+            <label for="username" class="sr-only">Username</label>
+            <input type="text" id="username" class="form-control" placeholder="Username" name="username" autocomplete="off" required>
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -72,24 +75,19 @@ header('Pragma: no-cache');
           </div>
 
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" name="password" id="password" required>
+            <label for="password" class="sr-only">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Password" name="password" required autocomplete="off">
             <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-lock"></span>
-              </div>
+              <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                <i class="fas fa-eye" id="toggleIcon"></i>
+              </button>
             </div>
           </div>
 
           <div class="row">
-            <div class="col-8">
-              <div class="icheck-primary">
-                <input type="checkbox" id="show-password">
-                <label for="show-password">Show Password</label>
-              </div>
-            </div>
 
-            <div class="col-4">
-              <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary btn-block">LogIn</button>
             </div>
           </div>
         </form>
@@ -104,14 +102,48 @@ header('Pragma: no-cache');
 
   <!-- JavaScript untuk menampilkan/sembunyikan password -->
   <script>
-    document.getElementById('show-password').addEventListener('change', function() {
-      var passwordInput = document.getElementById('password');
-      if (this.checked) {
-        passwordInput.type = 'text'; // Tampilkan password
-      } else {
-        passwordInput.type = 'password'; // Sembunyikan password
-      }
+    $(document).ready(function() {
+      $('#form-login').validate({
+        rules: {
+          username: {
+            required: true,
+            minlength: 3,
+            maxlength: 20
+          },
+          password: {
+            required: true,
+            minlength: 5,
+            maxlength: 255
+          }
+        },
+        errorElement: 'span',
+        errorPlacement: function(error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.input-group').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+          $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element, errorClass, validClass) {
+          $(element).removeClass('is-invalid');
+        }
+      });
     });
+
+    function togglePassword() {
+      const passwordField = document.getElementById('password');
+      const toggleIcon = document.getElementById('toggleIcon');
+
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
   </script>
 </body>
 

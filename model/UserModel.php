@@ -5,29 +5,37 @@ class UserModel extends Model
 {
     protected $db;
     protected $table = 'user';
-    protected $driver;
 
-    public function __construct($connection)
+    public function __construct()
     {
-        $this->db = $connection;
+        include('../lib/Connection.php');
+        $this->db = $db; // Mengambil koneksi dari Connection.php
     }
 
-    // Implementasi metode CRUD
     public function insertData($data)
     {
-        if ($this->driver == 'sqlsrv') {
-            sqlsrv_query($this->db, "INSERT INTO {$this->table} (username, password) VALUES (?, ?)", [
-                $data['username'],
-                password_hash($data['password'], PASSWORD_DEFAULT)
-            ]);
+        $query = "INSERT INTO {$this->table} (username, password, role) VALUES (?, ?, ?)";
+        $params = [
+            $data['username'],
+            password_hash($data['password'], PASSWORD_DEFAULT),
+            $data['role']
+        ];
+        $stmt = sqlsrv_query($this->db, $query, $params);
+        if (!$stmt) {
+            throw new Exception(print_r(sqlsrv_errors(), true));
         }
     }
 
     public function getData()
     {
-        $query = sqlsrv_query($this->db, "SELECT * FROM {$this->table}");
+        $query = "SELECT * FROM {$this->table}";
+        $stmt = sqlsrv_query($this->db, $query);
+        if (!$stmt) {
+            throw new Exception(print_r(sqlsrv_errors(), true));
+        }
+
         $data = [];
-        while ($row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
             $data[] = $row;
         }
         return $data;
@@ -35,70 +43,48 @@ class UserModel extends Model
 
     public function getDataById($id)
     {
-        $stmt = sqlsrv_query($this->db, "SELECT * FROM {$this->table} WHERE id = ?", [$id]);
+        $query = "SELECT * FROM {$this->table} WHERE id = ?";
+        $params = [$id];
+        $stmt = sqlsrv_query($this->db, $query, $params);
+        if (!$stmt) {
+            throw new Exception(print_r(sqlsrv_errors(), true));
+        }
         return sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     }
 
     public function updateData($id, $data)
     {
-        if ($this->driver == 'sqlsrv') {
-            $query = "UPDATE {$this->table} SET username = ?, password = ? WHERE id = ?";
-            sqlsrv_query($this->db, $query, [
-                $data['username'],
-                password_hash($data['password'], PASSWORD_DEFAULT),
-                $id
-            ]);
+        $query = "UPDATE {$this->table} SET username = ?, password = ?, role = ? WHERE id = ?";
+        $params = [
+            $data['username'],
+            password_hash($data['password'], PASSWORD_DEFAULT),
+            $data['role'],
+            $id
+        ];
+        $stmt = sqlsrv_query($this->db, $query, $params);
+        if (!$stmt) {
+            throw new Exception(print_r(sqlsrv_errors(), true));
         }
     }
 
     public function deleteData($id)
     {
-        if ($this->driver == 'sqlsrv') {
-            $query = "DELETE FROM {$this->table} WHERE id = ?";
-            sqlsrv_query($this->db, $query, [$id]);
+        $query = "DELETE FROM {$this->table} WHERE id = ?";
+        $params = [$id];
+        $stmt = sqlsrv_query($this->db, $query, $params);
+        if (!$stmt) {
+            throw new Exception(print_r(sqlsrv_errors(), true));
         }
     }
 
-    // Menambahkan fungsi getSingleDataByKeyword ke dalam kelas UserModel
-    public function getSingleDataByKeyword($column, $value)
+    public function getSingleDataByKeyword($column, $keyword)
     {
-        $query = "SELECT * FROM users WHERE $column = ?";
-        $params = [$value];
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
-
-        if ($stmt === false) {
-            $errors = sqlsrv_errors();
-            throw new Exception("Persiapan query gagal: " . $errors[0]['message']);
+        $query = "SELECT * FROM {$this->table} WHERE {$column} = ?";
+        $params = [$keyword];
+        $stmt = sqlsrv_query($this->db, $query, $params);
+        if (!$stmt) {
+            throw new Exception(print_r(sqlsrv_errors(), true));
         }
-
-        $result = sqlsrv_execute($stmt);
-
-        if ($result === false) {
-            $errors = sqlsrv_errors();
-            throw new Exception("Eksekusi query gagal: " . $errors[0]['message']);
-        }
-
-        $user = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-
-        return $user;
-    }
-
-    // Fungsi untuk validasi user
-    public function validateUser($username, $password)
-    {
-        try {
-            $user = $this->getSingleDataByKeyword('username', $username);
-
-            if (!$user) {
-                return false;
-            }
-
-            // Untuk sementara, perbandingan password biasa
-            // Nantinya gunakan password_hash() dan password_verify()
-            return ($password === $user['password']) ? $user : false;
-        } catch (Exception $e) {
-            error_log($e->getMessage());
-            return false;
-        }
+        return sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     }
 }

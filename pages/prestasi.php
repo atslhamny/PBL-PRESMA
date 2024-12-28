@@ -1,11 +1,36 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();  // Hanya panggil session_start jika sesi belum dimulai
+}
 require_once __DIR__ . '/../lib/Connection.php';
 
-// Define the search term (this could come from a form or query parameter)
-$searchTerm = '%'; // Default to match everything if no search term is provided
-if (isset($_GET['search'])) {
-    $searchTerm = '%' . $_GET['search'] . '%'; // Use the search term from the query string
+// Memeriksa apakah pengguna sudah login dengan memeriksa session 'user_id'
+if (!isset($_SESSION['user_id'])) {
+    die('Anda harus login untuk melihat data kompetisi.');
 }
+// Mendapatkan user_id dari sesi
+$userId = $_SESSION['user_id'];
+
+// Query untuk mencari ID mahasiswa berdasarkan user_id yang sedang login
+$queryMahasiswa = "
+SELECT id 
+FROM mahasiswa 
+WHERE user_id = ?
+";
+
+// Menyiapkan dan mengeksekusi query untuk mendapatkan ID mahasiswa
+$stmtMahasiswa = sqlsrv_prepare($db, $queryMahasiswa, array($userId));
+if ($stmtMahasiswa === false || !sqlsrv_execute($stmtMahasiswa)) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Mengambil ID mahasiswa dari hasil query
+$mahasiswa = sqlsrv_fetch_array($stmtMahasiswa, SQLSRV_FETCH_ASSOC);
+if (!$mahasiswa) {
+    die('Data mahasiswa tidak ditemukan.');
+}
+
+$mahasiswaId = $mahasiswa['id'];
 
 // Query for fetching data
 $query = "
@@ -13,26 +38,22 @@ SELECT
     k.id, 
     m.nama, 
     k.judul_kompetisi, 
-    t.tingkat_kompetisi,
-    k.tempat_kompetisi,
-    k.gelar,
+    k.catatan,
+    k.status,
+	t.tingkat_kompetisi,
     YEAR(k.tanggal_mulai) AS tahun
 FROM kompetisi k
 JOIN mahasiswa m ON k.id_mahasiswa = m.id
 JOIN tingkat_kompetisi t ON k.id_tingkat_kompetisi = t.id
-WHERE 
-    k.judul_kompetisi LIKE ? OR 
-    m.nama LIKE ? OR 
-    t.tingkat_kompetisi LIKE ?
+WHERE k.id_mahasiswa = ?
+
 ORDER BY k.tanggal_mulai DESC
 ";
 
 // Prepare the statement
-$stmt = sqlsrv_prepare($db, $query, array($searchTerm, $searchTerm, $searchTerm));
-
-// Execute the statement
+$stmt = sqlsrv_prepare($db, $query, array($mahasiswaId));
 if ($stmt === false || !sqlsrv_execute($stmt)) {
-    die(print_r(sqlsrv_errors(), true));
+die(print_r(sqlsrv_errors(), true));
 }
 ?>
 
@@ -55,7 +76,7 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                 <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
                     <li class="breadcrumb-item">
                         <span class="fas fa-home" style="margin-right: 5px;"></span>
-                        <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
+                        <a href="index.php" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
                     </li>
                     <li class="breadcrumb-item active">Prestasi Mahasiswa</li>
                 </ol>
@@ -78,7 +99,6 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                             <th>Judul Kompetisi</th>
                             <th>Tahun</th>
                             <th>Peringkat</th>
-                            <th>Tingkat Kompetisi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,7 +110,6 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                             <td>{$row['nama']}</td>
                             <td>{$row['judul_kompetisi']}</td>
                             <td>{$row['tahun']}</td>
-                            <td>{$row['gelar']}</td>
                             <td>{$row['tingkat_kompetisi']}</td>
                           </tr>";
                             $no++;

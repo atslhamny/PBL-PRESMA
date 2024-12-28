@@ -3,39 +3,56 @@ class Session
 {
     public function __construct()
     {
-        if (session_status() == PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
-
     public function set($key, $value)
     {
         $_SESSION[$key] = $value;
     }
-
     public function get($key)
     {
-        return $_SESSION[$key] ?? null;
+        return (isset($_SESSION[$key])) ? $_SESSION[$key] : null;
     }
-
+    public function exist($key)
+    {
+        return (isset($_SESSION[$key])) ? true : false;
+    }
+    public function delete($key)
+    {
+        if (isset($_SESSION[$key])) {
+            unset($_SESSION[$key]);
+        }
+    }
     public function setFlash($key, $value)
     {
         $_SESSION['flash'][$key] = $value;
     }
-
     public function getFlash($key)
     {
-        if (isset($_SESSION['flash'][$key])) {
-            $flash = $_SESSION['flash'][$key];
-            unset($_SESSION['flash'][$key]);
-            return $flash;
-        }
-        return null;
+        $value = (isset($_SESSION['flash'][$key])) ? $_SESSION['flash'][$key] : null;
+        $this->deleteFlash($key);
+        return $value;
     }
-
-    public function destroy()
+    public function deleteFlash($key)
     {
-        session_unset();
+        if (isset($_SESSION['flash'][$key])) {
+            unset($_SESSION['flash'][$key]);
+        }
+    }
+    public function deleteAllFlash()
+    {
+        if (isset($_SESSION['flash'])) {
+            unset($_SESSION['flash']);
+        }
+    }
+    public function deleteAll()
+    {
         session_destroy();
+    }
+    public function commit()
+    {
+        session_commit();
     }
 }

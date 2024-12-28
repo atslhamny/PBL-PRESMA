@@ -77,9 +77,9 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                 <ol class="breadcrumb float-sm-left" style="padding: 0; margin: 0;">
                     <li class="breadcrumb-item">
                         <span class="fas fa-home" style="margin-right: 5px;"></span>
-                        <a href="#" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
+                        <a href="index.php" style="text-decoration: none; color: inherit;">PresMa Polinema</a>
                     </li>
-                    <li class="breadcrumb-item active">Prestasi Mahasiswa</li>
+                    <li class="breadcrumb-item active">Menu Kompetisi</li>
                 </ol>
             </div>
         </div>
@@ -88,8 +88,8 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
     <section class="content">
         <div class="card">
             <div class="card-header" style="background-color: white;">
-                <h4><b>Daftar Prestasi</b></h4>
-                <p>Berikut adalah daftar prestasi yang telah diraih oleh Anda dalam berbagai kompetisi.</p>
+                <h4><b>Daftar Kompetisi</b></h4>
+                <p>Berikut adalah data kompetisi yang sudah Anda kirimkan</p>
                 <a href="index.php?page=tambah"><button type="button" class="btn btn-md btn-primary" style="float: right;">Tambah Data</button></a>
             </div>
             <div class="card-body">
