@@ -66,9 +66,6 @@ header('Pragma: no-cache');
           case 'kompetisi_admin':
             include("pages/kompetisiAdmin.php");
             break;
-          case 'tambah_mahasiswa':
-            include("pages/prestasiAdmin.php");
-            break;
           case 'edit_kompetisi_admin':
             include("pages/editKompetisiAdmin.php");
             break;

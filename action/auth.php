@@ -27,6 +27,7 @@ if (sqlsrv_has_rows($stmt)) {
     session_start();
     $_SESSION['is_login'] = true;
     $_SESSION['user_id'] = $row['id'];
+    $_SESSION['username'] = $row['username'];
     $_SESSION['role_id'] = $row['role_id'];
 
     // Arahkan pengguna sesuai dengan role mereka

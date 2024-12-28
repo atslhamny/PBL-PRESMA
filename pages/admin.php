@@ -16,14 +16,6 @@
              </a>
          </li>
 
-         <!-- Prestasi Mahasiswa -->
-         <li class="nav-item">
-             <a href="index.php?page=read_kompetisi_admin" class="nav-link <?= ($page === 'read_kompetisi_admin') ? 'active' : ''; ?>">
-                 <i class="nav-icon fas fa-user"></i>
-                 <p>Tambah Mahasiswa</p>
-             </a>
-         </li>
-
          <!-- Logout -->
          <li class="nav-item">
              <a href="./logout.php" class="nav-link">

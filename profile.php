@@ -1,3 +1,94 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start(); // Memastikan sesi telah dimulai
+}
+
+require_once __DIR__ . '/lib/Connection.php';
+
+// Memeriksa apakah pengguna sudah login
+if (!isset($_SESSION['user_id'])) {
+    die('Anda harus login untuk melihat data mahasiswa.');
+}
+
+// Mendapatkan user_id dari sesi
+$userId = $_SESSION['user_id'];
+
+// Query untuk mengambil data mahasiswa berdasarkan user_id
+$query = "
+    SELECT m.*, p.nama_prodi, j.nama_jurusan
+    FROM mahasiswa m
+    JOIN prodi p ON m.prodi_id = p.id
+    JOIN jurusan j ON m.jurusan_id = j.id
+    WHERE m.user_id = ?
+";
+$stmt = sqlsrv_query($db, $query, array($userId));
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$mahasiswa = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+// Jika data mahasiswa tidak ditemukan, beri pesan error
+if ($mahasiswa === null) {
+    die('Data mahasiswa tidak ditemukan.');
+}
+
+// Jika form disubmit, proses update
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Ambil data dari form
+    $nama = $_POST['nama'];
+    $nim = $_POST['nim'];
+    $prodi_id = $_POST['prodi_id'];
+    $jurusan_id = $_POST['jurusan_id'];
+    $tahun_masuk = $_POST['tahun_masuk'];
+
+    // // Foto baru (jika diupload)
+    // $foto = $mahasiswa['foto']; // Tetap menggunakan foto lama jika tidak ada upload baru
+    // if ($_FILES['foto']['name']) {
+    //     $foto = 'upload/' . basename($_FILES['foto']['name']);
+    //     move_uploaded_file($_FILES['foto']['tmp_name'], $foto); // Upload file foto
+    // }
+
+    function uploadFile($inputName, $prefix)
+    {
+        if (isset($_FILES[$inputName]) && $_FILES[$inputName]['error'] == UPLOAD_ERR_OK) {
+            $targetDir = "upload/";
+            $randomString = bin2hex(random_bytes(8)); // Membuat nama random
+            $fileExtension = pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION);
+            $fileName = $prefix . "_" . $randomString . "." . $fileExtension;
+            $targetFile = $targetDir . $fileName;
+
+            if (move_uploaded_file($_FILES[$inputName]['tmp_name'], $targetFile)) {
+                return $fileName; // Mengembalikan nama file yang telah disimpan
+            } else {
+                die("Error saat mengunggah file: " . $_FILES[$inputName]['name']);
+            }
+        }
+        return null;
+    }
+
+    $foto = uploadFile('foto', 'foto');
+
+
+    // Query untuk update data mahasiswa
+    $queryUpdate = "
+        UPDATE mahasiswa
+        SET nama = ?, nim = ?, prodi_id = ?, jurusan_id = ?, tahun_masuk = ?, foto = ?
+        WHERE user_id = ?
+    ";
+
+    $params = array($nama, $nim, $prodi_id, $jurusan_id, $tahun_masuk, $foto, $userId);
+    $stmtUpdate = sqlsrv_prepare($db, $queryUpdate, $params);
+
+    if ($stmtUpdate === false || !sqlsrv_execute($stmtUpdate)) {
+        die(print_r(sqlsrv_errors(), true));
+    } else {
+        echo "Profil berhasil diperbarui!";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,9 +108,6 @@
 
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-
-    <!-- Optional: Tambahkan CSS lokal jika ada -->
-    <!-- <link rel="stylesheet" href="css/style.css"> -->
 
     <style>
         body {
@@ -61,8 +149,6 @@
     </style>
 </head>
 
-<!-- <body class="hold-transition login-page"> -->
-
 <body class="hold-transition">
     <div class="login-box">
         <div class="card card-warning">
@@ -71,14 +157,14 @@
             </div>
 
             <!-- Form Start -->
-            <form>
+            <form action="index.php?page=dashboard" method="POST" enctype="multipart/form-data">
                 <div class="card-body">
                     <div class="card-body d-flex align-items-center">
                         <div class="profile-image">
-                            <img src="img/profil.png" id="foto" name="foto" class="img-thumbnail" alt="Profile">
+                            <img src="<?= isset($mahasiswa['foto']) ? $mahasiswa['foto'] : 'default.jpg' ?>" id="foto" name="foto" class="img-thumbnail" alt="Profile">
                         </div>
                         <div class="form-group ml-4" style="width: 100%;">
-                            <label for="exampleInputFile">Ubah Foto Profil</label>
+                            <label for="foto">Ubah Foto Profil</label>
                             <div class="input-group">
                                 <div class="custom-file">
                                     <input type="file" class="custom-file-input" id="foto" name="foto" accept=".jpg,.jpeg,.png" onchange="previewImage(event)">
@@ -94,68 +180,65 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="namaLengkap">Nama Lengkap</label>
-                                    <input type="text" class="form-control" id="namaLengkap" placeholder="Masukkan Nama Lengkap">
+                                    <input type="text" class="form-control" id="namaLengkap" name="nama" value="<?= isset($mahasiswa['nama']) ? $mahasiswa['nama'] : '' ?>" required>
                                 </div>
                             </div>
                             <!-- NIM -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="nim">NIM</label>
-                                    <input type="text" class="form-control" id="nim" placeholder="Masukkan NIM">
+                                    <input type="text" class="form-control" id="nim" name="nim" value="<?= isset($mahasiswa['nim']) ? $mahasiswa['nim'] : '' ?>" required>
                                 </div>
                             </div>
                             <!-- Jurusan -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="jurusan">Jurusan</label>
-                                    <input type="text" class="form-control" id="jurusan" value="Teknologi Informasi" disabled>
+                                    <select class="form-control" id="jurusan" name="jurusan_id" required>
+                                        <?php
+                                        // Query untuk mengambil data jurusan
+                                        $queryJurusan = "SELECT * FROM jurusan";
+                                        $stmtJurusan = sqlsrv_query($db, $queryJurusan);
+                                        while ($row = sqlsrv_fetch_array($stmtJurusan, SQLSRV_FETCH_ASSOC)) {
+                                            $selected = (isset($mahasiswa['jurusan_id']) && $mahasiswa['jurusan_id'] == $row['id']) ? 'selected' : '';
+                                            echo "<option value='{$row['id']}' {$selected}>{$row['nama_jurusan']}</option>";
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                             </div>
                             <!-- Prodi -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="prodi">Prodi</label>
-                                    <select class="form-control" id="prodi">
-                                        
+                                    <select class="form-control" id="prodi" name="prodi_id" required>
+                                        <?php
+                                        // Query untuk mengambil data program studi
+                                        $queryProdi = "SELECT * FROM prodi";
+                                        $stmtProdi = sqlsrv_query($db, $queryProdi);
+                                        while ($row = sqlsrv_fetch_array($stmtProdi, SQLSRV_FETCH_ASSOC)) {
+                                            $selected = (isset($mahasiswa['prodi_id']) && $mahasiswa['prodi_id'] == $row['id']) ? 'selected' : '';
+                                            echo "<option value='{$row['id']}' {$selected}>{$row['nama_prodi']}</option>";
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="exampleInputEmail1">Tahun Masuk</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="2023/2024" disabled>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
-                                    <i class="fas fa-eye" id="toggleIcon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="changePassword">Konfirmasi Password</label>
-                        <div class="input-group mb-3">
-                            <input type="password" class="form-control" placeholder="Password">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-lock"></span>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="tahun_masuk">Tahun Masuk</label>
+                                    <input type="text" class="form-control" id="tahun_masuk" name="tahun_masuk" value="<?= isset($mahasiswa['tahun_masuk']) ? $mahasiswa['tahun_masuk'] : '' ?>" required>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     <br>
 
                     <div class="row">
                         <div class="col-12">
-                            <a href="index.php" class="btn btn-primary btn-block text-white"> Update</a>
+                            <button type="submit" class="btn btn-primary btn-block">Update Profil</button>
                         </div>
                     </div>
 
@@ -174,19 +257,13 @@
     </div>
 
     <script>
-        function togglePassword() {
-            const passwordField = document.getElementById('exampleInputPassword1');
-            const toggleIcon = document.getElementById('toggleIcon');
-
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('foto');
+                output.src = reader.result;
             }
+            reader.readAsDataURL(event.target.files[0]);
         }
     </script>
 
