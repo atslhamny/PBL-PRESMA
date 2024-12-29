@@ -92,9 +92,6 @@ header('Pragma: no-cache');
           case 'hapus_kompetisi':
             include('pages/hapusKompetisi.php');
             break;
-          case 'detail':
-            include('pages/detailKompetisi.php');
-            break;
           case 'prestasi':
             include("pages/prestasi.php");
             break;

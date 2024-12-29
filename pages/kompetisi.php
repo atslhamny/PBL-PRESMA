@@ -90,6 +90,8 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
             <div class="card-header" style="background-color: white;">
                 <h4><b>Daftar Kompetisi</b></h4>
                 <p>Berikut adalah data kompetisi yang sudah Anda kirimkan</p>
+                <a href="#" id="export-pdf" class="btn btn-danger" style="margin-right: 5px;">Export PDF</a>
+                <a href="#" id="export-excel" class="btn btn-success">Export Excel</a>
                 <a href="index.php?page=tambah"><button type="button" class="btn btn-md btn-primary" style="float: right;">Tambah Data</button></a>
             </div>
             <div class="card-body">
@@ -133,8 +135,15 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                                     break;
                             }
                             echo "</td>
-                            <td><a href='index.php?page=edit_kompetisi&id={$row['id']}'>Edit</a>&nbsp;<a href='index.php?page=hapus_kompetisi&id={$row['id']}'>Hapus</a></td>                            
-                            </tr>";
+                                    <td>
+                                        <a href='index.php?page=edit_kompetisi&id={$row['id']}' title='Edit' style='color: #1E90FF; margin-right: 10px; font-size: 18px;'>
+                                        <i class='fa fa-edit'></i>
+                                        </a>
+                                        <a href='index.php?page=hapus_kompetisi&id={$row['id']}' title='Hapus' onclick='return confirm(\"Apakah Anda yakin ingin menghapus data ini?\")' style='color: #dc3545; font-size: 18px;'>
+                                        <i class='fa fa-trash'></i>
+                                        </a>
+                                    </td>
+                                </tr>";
                             $no++;
                         }
                         ?>
@@ -148,6 +157,9 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#table-data').DataTable({
@@ -165,6 +177,58 @@ if ($stmt === false || !sqlsrv_execute($stmt)) {
                     search: "Search:"
                 }
             });
+        });
+
+        document.getElementById('export-pdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Ambil data dari tabel
+            const table = document.getElementById('table-data');
+            const rows = table.querySelectorAll('tbody tr');
+            const data = [];
+            
+            rows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    rowData.push(cell.innerText);
+                });
+                data.push(rowData);
+            });
+
+            // Definisikan kolom
+            const columns = [
+                { header: 'No', dataKey: 'no' },
+                { header: 'Nama Mahasiswa', dataKey: 'nama' },
+                { header: 'Judul Kompetisi', dataKey: 'judul_kompetisi' },
+                { header: 'Tahun', dataKey: 'tahun' },
+                { header: 'Peringkat', dataKey: 'peringkat' },
+                { header: 'Catatan', dataKey: 'catatan' },
+                { header: 'Status', dataKey: 'status' }
+            ];
+
+            // Gunakan autoTable dengan data dan kolom
+            doc.autoTable({
+                head: [columns.map(col => col.header)],
+                body: data
+            });
+
+            doc.save('daftar_kompetisi.pdf');
+
+            // Tambahkan penundaan sebelum pengalihan
+            setTimeout(function() {
+                window.location.href = 'index.php?page=kompetisi';
+            }, 1000);
+        });
+
+        document.getElementById('export-excel').addEventListener('click', function() {
+            var wb = XLSX.utils.table_to_book(document.getElementById('table-data'), { sheet: "Sheet JS" });
+            XLSX.writeFile(wb, 'daftar_kompetisi.xlsx');
+
+            // Tambahkan penundaan sebelum pengalihan
+            setTimeout(function() {
+                window.location.href = 'index.php?page=kompetisi';
+            }, 1000); 
         });
     </script>
 </body>
