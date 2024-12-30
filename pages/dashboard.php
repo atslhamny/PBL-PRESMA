@@ -7,6 +7,7 @@ require_once __DIR__ . '/../lib/Connection.php';
 if (!isset($_SESSION['user_id'])) {
     die('Anda harus login untuk melihat data kompetisi.');
 }
+
 // Mendapatkan user_id dari sesi
 $userId = $_SESSION['user_id'];
 
@@ -22,8 +23,11 @@ GROUP BY t.tingkat_kompetisi
 
 // Prepare and execute the statement
 $stmtTingkat = sqlsrv_prepare($db, $queryTingkatKompetisi, array($userId));
-if ($stmtTingkat === false || !sqlsrv_execute($stmtTingkat)) {
-    die(print_r(sqlsrv_errors(), true));
+if ($stmtTingkat === false) {
+    die("Error preparing statement: " . print_r(sqlsrv_errors(), true));
+}
+if (!sqlsrv_execute($stmtTingkat)) {
+    die("Error executing statement: " . print_r(sqlsrv_errors(), true));
 }
 
 // Fetch the results into an associative array
@@ -31,8 +35,15 @@ $tingkatData = [];
 while ($row = sqlsrv_fetch_array($stmtTingkat, SQLSRV_FETCH_ASSOC)) {
     $tingkatData[$row['tingkat_kompetisi']] = $row['total'];
 }
-?>
 
+// Pastikan semua tingkat kompetisi ada (beri nilai default 0 jika tidak ada data)
+$allTingkat = ['Nasional', 'Internasional', 'Kab/Kota'];
+foreach ($allTingkat as $tingkat) {
+    if (!isset($tingkatData[$tingkat])) {
+        $tingkatData[$tingkat] = 0;
+    }
+}
+?>
 
 <!-- dashboard mahasiswa -->
 <style>

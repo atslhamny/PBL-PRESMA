@@ -170,7 +170,7 @@ if (isset($_REQUEST['simpan'])) {
                     while ($row0 = sqlsrv_fetch_array($stmt0, SQLSRV_FETCH_ASSOC)) {
                     ?>
 
-                        <form action="index.php?page=kompetisi" method="post" enctype='multipart/form-data'>
+                        <form action="index.php?page=edit_kompetisi" method="post" enctype='multipart/form-data'>
                             <form class="form-horizontal"><input type=hidden name='id' value='<?php echo $_REQUEST['id']; ?>'>
                                 <div class="card-body">
                                     <div class="form-group row">

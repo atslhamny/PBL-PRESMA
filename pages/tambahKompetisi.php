@@ -176,7 +176,7 @@ if (isset($_REQUEST['simpan'])) {
                         <h3 class="card-title">Data Kompetisi</h3>
                     </div>
 
-                    <form action="index.php?page=kompetisi" method="post" enctype='multipart/form-data'>
+                    <form action="index.php?page=tambah" method="post" enctype='multipart/form-data'>
                         <form class="form-horizontal">
                             <div class="card-body">
                                 <div class="form-group row">
