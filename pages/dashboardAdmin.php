@@ -1,98 +1,33 @@
+<?php 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();  // Hanya panggil session_start jika sesi belum dimulai
+}
+require_once __DIR__ . '/../lib/Connection.php';
 
+$queryStatusCounts = "
+SELECT 
+    status, 
+    COUNT(*) AS jumlah 
+FROM kompetisi 
+GROUP BY status
+";
 
+$stmtStatusCounts = sqlsrv_query($db, $queryStatusCounts);
+if ($stmtStatusCounts === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 
-<style>
-    /* General styling */
-    .breadcrumb {
-        background: none;
-        padding: 0;
-        margin: 0;
-    }
+$statusCounts = [
+    'Pending' => 0,
+    'Diterima' => 0,
+    'Ditolak' => 0,
+];
 
-    .breadcrumb a {
-        text-decoration: none;
-        color: inherit;
-    }
+while ($row = sqlsrv_fetch_array($stmtStatusCounts, SQLSRV_FETCH_ASSOC)) {
+    $statusCounts[$row['status']] = $row['jumlah'];
+}
+?>
 
-
-    .info-box {
-        display: flex;
-        align-items: center;
-        padding: 10px;
-        margin-bottom: 20px;
-        border-radius: 5px;
-        box-shadow: 0 1px 5px rgba(0, 0, 0.5, 0.3);
-    }
-
-    .info-box-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-    }
-
-    .card {
-        box-shadow: 0 6px 7px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-
-    .card-dash {
-        box-shadow: 0 6px 7px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin-bottom: 20px;
-        background-color: white;
-
-    }
-
-    .card img {
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-    }
-
-    .chart-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 15px;
-        padding: 20px;
-    }
-
-    .chart-container .card {
-        width: 48%;
-    }
-
-    .berita {
-        padding: 20px;
-    }
-
-    .berita .card {
-        width: 16rem;
-        padding: 10px;
-        box-shadow: 0 6px 7px rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
-    }
-
-    .berita img {
-        border-radius: 5px 5px 0 0;
-    }
-
-    .berita .card-title {
-        font-size: 15px;
-        margin-bottom: 5px;
-    }
-
-    .berita .card-text {
-        font-size: 14px;
-        color: #555;
-    }
-
-    .berita .btn {
-        font-size: 14px;
-    }
-</style>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -102,7 +37,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="path_to_your_styles.css">
+    <style>
+        /* General styling */
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .breadcrumb a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .info-box {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0.5, 0.3);
+        }
+
+        .info-box-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .card {
+            box-shadow: 0 6px 7px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .card-dash {
+            box-shadow: 0 6px 7px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+
+        .small-box {
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 14px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .small-box .icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            color: rgba(0, 0, 0, 0.1);
+        }
+
+        .small-box-footer {
+            display: block;
+            padding: 10px 0;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 
 <body>
@@ -135,54 +139,44 @@
             </div>
             <div class="row" style="justify-content: center; padding:15px;">
                 <div class="col-lg-4 col-6">
-                    <div class="small-box bg-lightblue" style="border-radius: 20px;">
-                        <div class="inner" style="padding: 14px;">
-                            <h3>150</h3>
-                            <p>Kompetisi Mahasiswa</p>
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3><?= $statusCounts['Pending'] ?></h3>
+                            <p>Pending</p>
                         </div>
-                        <div class="icon" style="padding: 5px;">
-                            <i class="fas fa-trophy"></i>
+                        <div class="icon">
+                            <i class="fas fa-hourglass-half"></i>
                         </div>
-                        <a href="index.php?page=kompetisi_admin" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="index.php?page=kompetisi&status=Pending" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-6">
-                    <div class="small-box bg-maroon" style="border-radius: 20px;">
-                        <div class="inner" style="padding: 14px;">
-                            <h3>150</h3>
-                            <p>Mahasiswa Berprestasi</p>
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3><?= $statusCounts['Diterima'] ?></h3>
+                            <p>Diterima</p>
                         </div>
-                        <div class="icon" style="padding: 5px;">
-                            <i class="fas fa-graduation-cap"></i>
+                        <div class="icon">
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <a href="index.php?page=prestasi" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="index.php?page=kompetisi&status=Diterima" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-6">
-                    <div class="small-box bg-warning" style="border-radius: 20px;">
-                        <div class="inner" style="padding: 14px;">
-                            <h3>150</h3>
-                            <p>Prestasi Mahasiswa</p>
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3><?= $statusCounts['Ditolak'] ?></h3>
+                            <p>Ditolak</p>
                         </div>
-                        <div class="icon" style="padding: 5px;">
-                            <i class="fas fa-medal"></i>
+                        <div class="icon">
+                            <i class="fas fa-times-circle"></i>
                         </div>
-                        <a href="index.php?page=prestasi_admin" class="small-box-footer" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="index.php?page=kompetisi&status=Ditolak" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
             </div>
-
-            
-
         </div>
     </section>
-
-    <script>
-        function deleteCard(button) {
-            const card = button.closest('.card');
-            card.parentNode.removeChild(card);
-        }
-    </script>
 </body>
 
 </html>
